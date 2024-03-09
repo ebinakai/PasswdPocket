@@ -26,7 +26,7 @@
 </template>
 
 <script>
-import axios from 'axios';
+import apiClient from '@/api/client';
 
 export default {
   name: 'Login',
@@ -52,7 +52,7 @@ export default {
     },
     async login() {
       try {
-        const response = await axios.post('http://localhost:3000/login', {
+        const response = await apiClient.post('http://localhost:3000/login', {
           username: this.username,
           password: this.password
         });

@@ -1,8 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import axios from 'axios';
 import Home from '../views/Home.vue';
 import Login from '../views/Login.vue';
 import Logout from '../views/Logout.vue';
+import apiClient from '@/api/client';
 
 const routes = [
   { path: '/', component: Home, meta: { requiresAuth: true } }, // ログインが必要なルートにはメタフィールドを追加
@@ -27,7 +27,7 @@ router.beforeEach((to, from, next) => {
       next('/login');
     } else {
       // `/valid` エンドポイントでトークンの検証を行う
-      axios.post('http://localhost:3000/valid', {}, {
+      apiClient.post('/valid', {}, {
         headers: {
           'Authorization': `Bearer ${token}`
         }

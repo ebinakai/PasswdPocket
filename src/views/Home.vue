@@ -86,7 +86,7 @@
 
 <script>
 import SideBar from '../components/SideBar.vue';
-import axios from 'axios';
+import apiClient from '@/api/client';
 
 export default {
   name: 'Home',
