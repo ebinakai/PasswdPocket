@@ -86,7 +86,7 @@
 
 <script>
 import SideBar from '../components/SideBar.vue';
-
+import axios from 'axios';
 
 export default {
   name: 'Home',
@@ -156,7 +156,4 @@ export default {
   cursor: pointer;
 }
 
-.form-control.is-invalid {
-  border-color: var(--bs-danger);
-}
 </style>

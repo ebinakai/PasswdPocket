@@ -5,16 +5,16 @@
     </header>
 
     <main class="flex-grow-1 d-flex align-items-center justify-content-center">
-      <form action="" class="py-4">
+      <form @submit.prevent="validateForm" class="py-4">
         <h2 class="text-center fs-3 mb-4">Login</h2>
         <div class="mb-4">
-          <input type="email" class="form-control" placeholder="Username">
+          <input type="text" class="form-control" placeholder="Username" v-model="username" :class="{ 'is-invalid': failed_username }" autocomplete="username">
         </div>
         <div class="mb-4">
-          <input type="password" class="form-control" aria-labelledby="passwordHelpBlock" placeholder="Password">
+          <input type="password" class="form-control" aria-labelledby="passwordHelpBlock" placeholder="Password" v-model="password" :class="{ 'is-invalid': failed_password }" autocomplete="current-password">
         </div>
         <div class="d-grid gap-2">
-          <button class="btn btn-secondary" type="button">Pocket In</button>
+          <button class="btn btn-secondary" type="submit">Pocket In</button>
         </div>
       </form>
     </main>
@@ -24,6 +24,57 @@
     </footer>
   </div>
 </template>
+
+<script>
+import axios from 'axios';
+
+export default {
+  name: 'Login',
+  data() {
+    return {
+      username: '',
+      password: '',
+      failed_username: false, // ユーザー名入力のバリデーション状態
+      failed_password: false, // パスワード入力のバリデーション状態
+    };
+  },
+  methods: {
+    async validateForm() {
+      this.failed_username = this.username.trim() === '';
+      this.failed_password = this.password.trim() === '';
+
+      if (!this.failed_username && !this.failed_password) {
+        await this.login(); // loginメソッドの完了を待つ
+        this.username = '';
+        this.password = '';
+        console.log('submit');
+      }
+    },
+    async login() {
+      try {
+        const response = await axios.post('http://localhost:3000/login', {
+          username: this.username,
+          password: this.password
+        });
+        console.log('Login successful:', response.data);
+        localStorage.setItem('token', response.data.token);
+        
+        // ログイン成功後の処理を行う
+        this.$router.push('/'); // ルートパスにリダイレクト
+      } catch (error) {
+        console.error('Login failed:', error);
+        // ログイン失敗時の処理を行う
+        this.failed_username = true;
+        this.failed_password = true;
+      }
+    },
+  },
+  mounted() {
+  },
+  beforeUnmount() {
+  }
+}
+</script>
 
 <style scoped>
 form {
