@@ -56,12 +56,6 @@ header h1 {
   width: 40px;
 }
 
-.btn-icon:hover {
-  color: var(--bs-btn-color);
-  background-color: transparent;
-  opacity: .8;
-}
-
 
 /* ボタン
 ============================================================================================================ */
