@@ -1,0 +1,71 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&display=swap');
+
+/* 全体設定 
+============================================================================================================ */
+:root {
+  --base-color-1: #eee;
+  --base-color-2: #aaa;
+  --base-color-3: #666;
+  --base-color-4: #222;
+
+  --theme-color-1: #BBE1FA;
+  --theme-color-2: #3282B8;
+  --theme-color-3: #0F4C75;
+  --theme-color-4: #1B262C;
+
+}
+
+html {
+  font-size: 16px;
+}
+
+body {
+  font-family: "Noto Sans JP", sans-serif;
+  font-size: 16px;
+  background-color: var(--base-color-1);
+  color: var(--base-color-3);
+}
+
+#wrapper {
+  min-height: 100vh;
+}
+
+.material-symbols-outlined {
+  font-variation-settings:
+  'FILL' 0,
+  'wght' 600,
+  'GRAD' 0,
+  'opsz' 24
+}
+
+/* ヘッダー
+============================================================================================================ */
+header h1 {
+  color: var(--theme-color-4);
+  font-size: 2rem;
+}
+
+/* ボタン
+============================================================================================================ */
+.btn-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 .25rem;
+  height: 40px;
+  width: 40px;
+}
+
+.btn-icon:hover {
+  color: var(--bs-btn-color);
+  background-color: transparent;
+  opacity: .8;
+}
+
+
+/* ボタン
+============================================================================================================ */
+.form-control:focus {
+  border-color: var(--theme-color-2);
+  box-shadow: none;
+}
