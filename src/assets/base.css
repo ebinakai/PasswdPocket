@@ -56,6 +56,10 @@ header h1 {
   width: 40px;
 }
 
+.btn-icon .material-symbols-outlined {
+  font-variation-settings:
+  'wght' 300
+}
 
 /* ボタン
 ============================================================================================================ */

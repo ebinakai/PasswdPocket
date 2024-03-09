@@ -40,7 +40,7 @@
     </footer>
   </div>
   <!-- Modal -->
-  <div class="modal fade" id="newPwModal" tabindex="-1" aria-labelledby="newPwModalLabel" aria-hidden="true">
+  <div class="modal fade" id="newPwModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="newPwModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
@@ -49,17 +49,35 @@
         </div>
         <div class="modal-body">
           <div class="mb-4">
-            <input type="text" id="newUsername" class="form-control" aria-labelledby="usernameHelpBlock" placeholder="Username">
+            <input type="text"
+                  id="newUsername"
+                  class="form-control"
+                  :class="{ 'is-invalid': failed_username }"
+                  aria-labelledby="usernameHelpBlock"
+                  placeholder="Username"
+                  v-model="new_username">
           </div>
           <div class="mb-4">
-            <input type="password" id="newPassword" class="form-control" aria-labelledby="passwordHelpBlock" placeholder="Password">
+            <input type="password"
+                  id="newPassword"
+                  class="form-control"
+                  :class="{ 'is-invalid': failed_password }"
+                  aria-labelledby="passwordHelpBlock"
+                  placeholder="Password"
+                  v-model="new_password">
           </div>
           <div>
-            <input type="password" id="newPasswordAgain" class="form-control" aria-labelledby="passwordHelpBlock" placeholder="Password Again">
+            <input type="password"
+                  id="newPasswordAgain"
+                  class="form-control"
+                  :class="{ 'is-invalid': failed_password_again }"
+                  aria-labelledby="passwordHelpBlock"
+                  placeholder="Password Again"
+                  v-model="new_password_again">
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary flex-grow-1 w-100">Save</button>
+          <button id="newRecordSubmit" type="button" class="btn btn-secondary flex-grow-1 w-100">Save</button>
         </div>
       </div>
     </div>
@@ -69,20 +87,47 @@
 <script>
 import SideBar from '../components/SideBar.vue';
 
+
 export default {
-  name: 'Home', // コンポーネントの名前
+  name: 'Home',
   components: {
-    SideBar // ここでコンポーネントを登録
+    SideBar
   },
   data() {
     return {
-      // データプロパティ
+      new_username: '',
+      new_password: '',
+      new_password_again: '',
+      failed_username: false, // ユーザー名入力のバリデーション状態
+      failed_password: false, // パスワード入力のバリデーション状態
+      failed_password_again: false, // パスワード確認入力のバリデーション状態
     };
   },
   methods: {
-    // メソッド
-  }, 
+    validateForm() {
+      this.failed_username = this.new_username.trim() === '';
+      this.failed_password = this.new_password.trim() === '';
+      this.failed_password_again = this.new_password_again.trim() === '' || this.new_password !== this.new_password_again;
+
+      if (!this.failed_username && !this.failed_password && !this.failed_password_again) {
+        this.closeModal();
+        this.new_username = '';
+        this.new_password = '';
+        this.new_password_again = '';
+        console.log('submit');
+      }
+    },
+    closeModal() {
+      const modalElement = document.getElementById('newPwModal');
+      const modalInstance = bootstrap.Modal.getInstance(modalElement);
+      modalInstance.hide();
+    }
+  },
   mounted() {
+    document.getElementById('newRecordSubmit').addEventListener('click', this.validateForm);
+  },
+  beforeUnmount() {
+    document.getElementById('newRecordSubmit').removeEventListener('click', this.validateForm);
   }
 }
 </script>
@@ -100,11 +145,6 @@ export default {
   width: 30%;
 }
 
-#table-pw .btn-icon .material-symbols-outlined {
-  font-variation-settings:
-  'wght' 300
-}
-
 #table-pw .btn-icon:hover {
   color: var(--bs-btn-color);
   background-color: transparent;
@@ -114,5 +154,9 @@ export default {
 #table-pw tr td:hover {
   color: var(--base-color-4);
   cursor: pointer;
+}
+
+.form-control.is-invalid {
+  border-color: var(--bs-danger);
 }
 </style>
