@@ -8,16 +8,23 @@ const saltRounds = 10; // bcrypt のソルトの生成に使用するラウン�
 export const setupDatabase = async () => {
   // データベースファイルを開く
   const db = await open({
-    filename: './mydb.sqlite',
+    filename: './pocket.sqlite',
     driver: sqlite3.Database,
   });
 
   // ユーザーテーブルの作成
   await db.run(`CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username TEXT NOT NULL UNIQUE,
-    password TEXT NOT NULL
+    username VARCHAR(20) NOT NULL UNIQUE,
+    password VARCHAR(200) NOT NULL
   )`);
+
+  await db.run(`CREATE TABLE IF NOT EXISTS passwords(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    service varchar(50) NOT NULL,
+    username varchar(50) NOT NULL,
+    password varchar(40) NOT NULL
+  )`)
 
   // ユーザーデータの挿入（パスワードは実際にはハッシュ化するべきです）
   const users = [
@@ -38,7 +45,7 @@ export const setupDatabase = async () => {
 
 export const openDb = async () => {
   return open({
-    filename: './mydb.sqlite',
+    filename: './pocket.sqlite',
     driver: sqlite3.Database,
   });
 };
