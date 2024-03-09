@@ -26,6 +26,11 @@ const users = [
     id: 2,
     username: 'user2',
     password: 'password2'
+  },
+  {
+    id: 3,
+    username: 'root',
+    password: 'root'
   }
 ];
 
@@ -44,6 +49,35 @@ app.post('/login', (req, res) => {
   } else {
     res.status(401).send('認証に失敗しました');
   }
+});
+
+app.post('/valid', (req, res) => {
+  const token = req.headers.authorization?.split(' ')[1]; // "Bearer <token>"形式からトークンを取得
+
+  if (!token) {
+    console.debug('トークンが提供されていません');
+    return res.status(403).send('トークンが提供されていません');
+  }
+
+  jwt.verify(token, SECRET_KEY, (err, decoded) => {
+    if (err) {
+      console.debug('トークンの検証に失敗しました');
+      return res.status(401).send('トークンの検証に失敗しました');
+    }
+
+    // トークンが有効な場合、デコードされたペイロードを使用して何らかの処理を行うことができます
+    // 例: ユーザーIDに基づいてユーザー情報を取得
+    const user = users.find(u => u.id === decoded.id);
+
+    if (!user) {
+      console.debug('ユーザーが見つかりません');
+      return res.status(404).send('ユーザーが見つかりません');
+    }
+
+    // トークンが有効で、対応するユーザーが見つかった場合、何らかの成功レスポンスを返します
+      console.debug('トークンが有効です');
+      res.json({ message: 'トークンが有効です', user });
+  });
 });
 
 // サーバー起動
