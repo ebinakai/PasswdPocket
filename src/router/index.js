@@ -1,11 +1,13 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Home from '../views/Home.vue';
+import Trash from '../views/Trash.vue';
 import Login from '../views/Login.vue';
 import Logout from '../views/Logout.vue';
 import apiClient from '@/api/client';
 
 const routes = [
-  { path: '/', component: Home, meta: { requiresAuth: true } }, // ログインが必要なルートにはメタフィールドを追加
+  { path: '/', component: Home, meta: { requiresAuth: true } },
+  { path: '/trash', component: Trash, meta: { requiresAuth: true } },
   { path: '/login', component: Login },
   { path: '/logout', component: Logout },
 ];
@@ -20,7 +22,6 @@ router.beforeEach((to, from, next) => {
   if (to.matched.some(record => record.meta.requiresAuth)) {
     // ローカルストレージからトークンを取得
     const token = localStorage.getItem('token');
-    console.debug('token: ' + token);
     
     if (!token) {
       // トークンがlocalStorageにない場合は、ログインページへリダイレクト

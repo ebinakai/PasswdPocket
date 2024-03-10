@@ -52,7 +52,7 @@ export default {
     },
     async login() {
       try {
-        const response = await apiClient.post('http://localhost:3000/login', {
+        const response = await apiClient.post('/login', {
           username: this.username,
           password: this.password
         });
@@ -67,7 +67,7 @@ export default {
         this.failed_username = true;
         this.failed_password = true;
       }
-    },
+    }
   },
   mounted() {
   },

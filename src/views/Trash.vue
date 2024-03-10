@@ -2,7 +2,7 @@
   <SideBar />
   <div class="page-wrapper flex-grow-1 d-flex flex-column px-3 pt-5">
     <header class="d-flex justify-content-between">
-      <h1>Passwd Pocket</h1>
+      <h1>Back Pocket</h1>
       <div class="me-3">
         <button class="btn btn-secondary btn-icon" data-bs-toggle="modal" data-bs-target="#newPwModal" @click="openModalAddPassword"><span class="material-symbols-outlined">add</span></button>
       </div>
@@ -50,28 +50,6 @@
       &copy; EbinaKai 2024
     </footer>
   </div>
-  <!-- 追加モーダル -->
-  <PasswordModal 
-    ref="addPasswordModal" 
-    @next="addPassword"
-  />
-
-  <!-- 編集モーダル -->
-  <PasswordModal 
-    ref="editPasswordModal" 
-    @next="editPassword"
-    :newService="editablePassword.service"
-    :newUsername="editablePassword.username"
-    :newPassword="editablePassword.password"
-    :newPasswordAgain="editablePassword.password"
-  />
-
-  <!-- 確認モーダル -->
-  <ConfirmModal 
-    ref="confirmModal" 
-    @next="deletePassword"
-    confirmMessage="Are you sure you want to delete this item?" />
-  
 </template>
 
 <script>
@@ -80,12 +58,11 @@ import PasswordModal from '../components/PasswordModal.vue';
 import ConfirmModal from '../components/ConfirmModal.vue';
 import apiClient from '@/api/client';
 
+
 export default {
-  name: 'Home',
+  name: 'Trash',
   components: {
     SideBar,
-    PasswordModal,
-    ConfirmModal,
   },
   data() {
     return {
@@ -94,23 +71,6 @@ export default {
     };
   },
   methods: {
-    // パスワード追加モーダルを開く
-    openModalAddPassword() {
-      this.$refs.addPasswordModal.show();
-    },
-
-    // パスワード編集モーダルを開く
-    openEditModal(password) {
-      this.editablePassword = { ...password }; // クリックされた行のデータで editablePassword を更新
-      this.$refs.editPasswordModal.show(); // モーダルを開く
-    },
-
-    // パスワード削除モーダルを開く
-    openConfirmModal(password) {
-      this.editablePassword = { ...password };
-      this.$refs.confirmModal.show();
-    },
-
     // パスワード一覧を取得
     async getPasswordList() {
       const token = localStorage.getItem('token');
@@ -122,7 +82,7 @@ export default {
       }
 
       // パスワード一覧を取得
-      const response = await apiClient.post('/password_list', {
+      const response = await apiClient.post('/trash_list', {
         token: localStorage.getItem('token')
       }, {
         headers: {
@@ -131,83 +91,10 @@ export default {
       });
 
       // response.data.passwords にパスワード一覧が入っている
+      console.debug('Get Passwords Successfully:', response.data);
       this.listPasswords = response.data.passwords;
     },
 
-    // パスワードを追加
-    async addPassword(data) {
-      const token = localStorage.getItem('token');
-
-      // トークンがない場合はエラーを出力して終了
-      if (token === null) {
-        console.error('Token is not found.');
-        return;
-      }
-
-      // パスワードをデータベースに登録
-      const response = await apiClient.post('/add_password', {
-        service: data.service,
-        username: data.username,
-        password: data.password,
-      }, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      // パスワード登録成功したら一覧を再取得
-      this.getPasswordList();
-    },
-
-    // パスワードを編集
-    async editPassword(data) {
-      const token = localStorage.getItem('token');
-
-      // トークンがない場合はエラーを出力して終了
-      if (token === null) {
-        console.error('Token is not found.');
-        return;
-      }
-
-      // 編集結果をデータベースに送信
-      const response = await apiClient.post('/edit_password', {
-        id: this.editablePassword.id,
-        service: data.service,
-        username: data.username,
-        password: data.password,
-      }, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      // パスワード登録成功したら一覧を再取得
-      this.getPasswordList();
-    },
-
-    // パスワードを削除
-    async deletePassword() {
-      const token = localStorage.getItem('token');
-
-      // トークンがない場合はエラーを出力して終了
-      if (token === null) {
-        console.error('Token is not found.');
-        return;
-      }
-
-
-      // 削除対象のパスワードをデータベースから削除
-      const response = await apiClient.post('/delete_password', {
-        id: this.editablePassword.id,
-      }, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      // パスワード削除成功したら一覧を再取得
-      this.getPasswordList();
-    },
   },
   mounted() {
     this.getPasswordList();
