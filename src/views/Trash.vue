@@ -20,9 +20,17 @@
             <th colspan="3" class="text-center">pocket is empty...</th>
           </tr>
           <tr v-for="(password, index) in listPasswords" :key="index">
-            <td scope="row">{{ password.service }}</td>
-            <td>{{ password.username }}</td>
-            <td>{{ password.isVisible ? password.password : '********' }}</td>
+            <td scope="row">
+              {{ password.service }}
+            </td>
+            <td>
+              <button class="btn-outline-sccess btn-icon"></button>
+              {{ password.username }}
+            </td>
+            <td>
+              <button class="btn-outline-sccess btn-icon"></button>
+              {{ password.isVisible ? password.password : '********' }}
+            </td>
             <td>
               <div class="d-flex justify-content-center">
                 <button class="btn btn-outline-success btn-icon" @click="toggleVisiblePassword(index)">

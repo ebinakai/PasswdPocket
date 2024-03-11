@@ -60,6 +60,15 @@ header h1 {
   width: 40px;
 }
 
+.btn-icon-lg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 .25rem;
+  height: 60px;
+  width: 60px;
+}
+
 .btn-icon .material-symbols-outlined {
   font-variation-settings:
   'wght' 300
@@ -138,4 +147,12 @@ header h1 {
   color: var(--base-color-1);
   border: 1px solid var(--theme-color-3);
   opacity: .8;
+}
+
+.btn-outline-theme-4 {
+  background-color: transparent;
+  color: var(--theme-color-4);
+}
+.btn-outline-theme-4:hover {
+  border: 1px solid var(--theme-color-4);
 }

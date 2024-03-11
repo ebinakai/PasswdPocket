@@ -3,8 +3,8 @@
   <div class="page-wrapper flex-grow-1 d-flex flex-column px-3 pt-5">
     <header class="d-flex justify-content-between">
       <h1>Passwd Pocket</h1>
-      <div class="me-3">
-        <button class="btn btn-theme-4 btn-icon" @click="openAddModal"><span class="material-symbols-outlined">add</span></button>
+      <div class="me-3" id="btn-add">
+        <button class="btn btn-theme-3 btn-icon-lg rounded-pill" @click="openAddModal"><span class="material-symbols-outlined">add</span></button>
       </div>
     </header>
     
@@ -23,9 +23,25 @@
             <th colspan="3" class="text-center">pocket is empty...</th>
           </tr>
           <tr v-for="(password, index) in listPasswords" :key="index">
-            <td scope="row">{{ password.service }}</td>
-            <td>{{ password.username }}</td>
-            <td>{{ password.isVisible ? password.password : '********' }}</td>
+            <td scope="row">
+              {{ password.service }}
+            </td>
+            <td>
+              <div class="d-flex align-items-center justify-content-between">
+                {{ password.username }}
+                <button class="btn btn-icon btn-outline-theme-4 me-3" @click="copy(password.username, `username-${index}`)">
+                  <span class="material-symbols-outlined">{{ lastCopied === `username-${index}` ? 'done' : 'content_copy' }}</span>
+                </button>
+              </div>
+            </td>
+            <td>
+              <div class="d-flex align-items-center justify-content-between">
+                {{ password.isVisible ? password.password : '********' }}
+                <button class="btn btn-icon btn-outline-theme-4 me-3" @click="copy(password.password, `password-${index}`)">
+                  <span class="material-symbols-outlined">{{ lastCopied === `password-${index}` ? 'done' : 'content_copy' }}</span>
+                </button>
+              </div>
+            </td>
             <td>
               <div class="d-flex justify-content-center">
                 <button class="btn btn-outline-success btn-icon" @click="toggleVisiblePassword(index)">
@@ -98,9 +114,21 @@ export default {
       editablePassword: {},
       listPasswords: [],
       key: sessionStorage.getItem('key'),
+      lastCopied: '',
     };
   },
   methods: {
+    copy(data, label) {
+      if (navigator.clipboard) { // クリップボードAPIが利用可能かチェック
+        navigator.clipboard.writeText(data).then(() => {
+          this.lastCopied = label;
+        }).catch(err => {
+          console.error('クリップボードへのコピーに失敗しました:', err);
+        });
+      } else {
+        console.error('クリップボードAPIがこのブラウザでは利用できません。');
+      }
+    },
     // パスワード追加モーダルを開く
     openAddModal() {
       this.$refs.addPasswordModal.show();
@@ -243,7 +271,12 @@ export default {
     },
   },
   mounted() {
+    // パスワード一覧を取得
     this.getPasswordList();
+
+    // ツールチップを有効化
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
   },
 }
 </script>
@@ -253,8 +286,13 @@ export default {
   border-bottom: 1px solid var(--base-color-2);
 }
 
+#table-pw tr th, #table-pw tr td {
+  padding-left: .5rem;
+}
+
 #table-pw tr td, #table-pw tr th {
-  padding: .5rem;
+  padding-top: .5rem;
+  padding-bottom: .5rem;
 }
 
 #table-pw tr th, #table-pw td {
@@ -264,5 +302,16 @@ export default {
 #table-pw tbody tr:hover {
   background-color: var(--theme-color-1);
   cursor: pointer;
+}
+
+#btn-add {
+  position: fixed;
+  bottom: 5rem;
+  right: 5rem;
+  transition: transform .3s;
+}
+
+#btn-add:hover {
+  transform: scale(1.3);
 }
 </style>
