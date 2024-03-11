@@ -79,6 +79,7 @@ import SideBar from '../components/SideBar.vue';
 import PasswordModal from '../components/PasswordModal.vue';
 import ConfirmModal from '../components/ConfirmModal.vue';
 import apiClient from '@/api/client';
+import { encrypt, decrypt } from '@/api/cryption';
 
 export default {
   name: 'Home',
@@ -91,6 +92,7 @@ export default {
     return {
       editablePassword: {},
       listPasswords: [],
+      key: sessionStorage.getItem('key'),
     };
   },
   methods: {
@@ -113,7 +115,7 @@ export default {
 
     // パスワード一覧を取得
     async getPasswordList() {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
 
       // トークンがない場合はエラーを出力して終了
       if (token === null) {
@@ -123,7 +125,7 @@ export default {
 
       // パスワード一覧を取得
       const response = await apiClient.post('/password_list', {
-        token: localStorage.getItem('token')
+        token: sessionStorage.getItem('token')
       }, {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -131,12 +133,22 @@ export default {
       });
 
       // response.data.passwords にパスワード一覧が入っている
-      this.listPasswords = response.data.passwords;
+      console.debug(response.data.passwords);
+
+      this.listPasswords = response.data.passwords.map( item => {
+        return {
+          id: item.id,
+          service: item.service,
+          username: item.username,
+          password: decrypt(item.password, this.key),
+        }
+      });
+      console.log(this.listPasswords);
     },
 
     // パスワードを追加
     async addPassword(data) {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
 
       // トークンがない場合はエラーを出力して終了
       if (token === null) {
@@ -148,7 +160,7 @@ export default {
       const response = await apiClient.post('/add_password', {
         service: data.service,
         username: data.username,
-        password: data.password,
+        password: encrypt(data.password, this.key),
       }, {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -161,7 +173,7 @@ export default {
 
     // パスワードを編集
     async editPassword(data) {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
 
       // トークンがない場合はエラーを出力して終了
       if (token === null) {
@@ -174,7 +186,7 @@ export default {
         id: this.editablePassword.id,
         service: data.service,
         username: data.username,
-        password: data.password,
+        password: encrypt(data.password, this.key),
       }, {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -187,7 +199,7 @@ export default {
 
     // パスワードを削除
     async deletePassword() {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
 
       // トークンがない場合はエラーを出力して終了
       if (token === null) {

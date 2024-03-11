@@ -73,7 +73,7 @@ export default {
   methods: {
     // パスワード一覧を取得
     async getPasswordList() {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
 
       // トークンがない場合はエラーを出力して終了
       if (token === null) {
@@ -83,7 +83,7 @@ export default {
 
       // パスワード一覧を取得
       const response = await apiClient.post('/trash_list', {
-        token: localStorage.getItem('token')
+        token: sessionStorage.getItem('token')
       }, {
         headers: {
           'Authorization': `Bearer ${token}`

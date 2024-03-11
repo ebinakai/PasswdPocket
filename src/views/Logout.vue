@@ -2,7 +2,7 @@
 export default {
   name: 'Logout',
   mounted() {
-    localStorage.removeItem('token');
+    sessionStorage.removeItem('token');
     this.$router.push('/login');
   },
 }

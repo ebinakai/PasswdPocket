@@ -27,6 +27,7 @@
 
 <script>
 import apiClient from '@/api/client';
+import { hashWithFixedSalt } from '@/api/cryption';
 
 export default {
   name: 'Login',
@@ -47,17 +48,21 @@ export default {
         await this.login(); // loginメソッドの完了を待つ
         this.username = '';
         this.password = '';
-        console.log('submit');
       }
     },
     async login() {
       try {
+        
         const response = await apiClient.post('/login', {
           username: this.username,
-          password: this.password
+          password: this.password,
         });
         console.log('Login successful:', response.data);
-        localStorage.setItem('token', response.data.token);
+
+        // パスワードを固定ソルトでハッシュ化して保存
+        const hashedPassword = await hashWithFixedSalt(this.password);
+        sessionStorage.setItem('token', response.data.token);
+        sessionStorage.setItem('key', hashedPassword);
         
         // ログイン成功後の処理を行う
         this.$router.push('/'); // ルートパスにリダイレクト

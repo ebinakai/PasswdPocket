@@ -1,16 +1,22 @@
 // database.js
-import bcrypt from 'bcrypt';
 import sqlite3 from 'sqlite3';
 import { open } from 'sqlite'; // sqliteパッケージを利用
+import { hashPassword } from './functions.js';
 
 const saltRounds = 10; // bcrypt のソルトの生成に使用するラウンド数
+const DB_FILE = './pocket.sqlite'; // データベースファイルのパス
 
 export const setupDatabase = async () => {
   // データベースファイルを開く
   const db = await open({
-    filename: './pocket.sqlite',
+    filename: DB_FILE,
     driver: sqlite3.Database,
   });
+
+
+  // 既存のテーブルを削除
+  await db.run('DROP TABLE IF EXISTS users');
+  await db.run('DROP TABLE IF EXISTS passwords');
 
   // ユーザーテーブルの作成
   await db.run(`CREATE TABLE IF NOT EXISTS users (
@@ -19,37 +25,34 @@ export const setupDatabase = async () => {
     password VARCHAR(200) NOT NULL
   )`);
 
-  // 既存のテーブルを削除
-  await db.run('DROP TABLE IF EXISTS passwords');
-
   // パスワードテーブルの作成
   await db.run(`CREATE TABLE passwords(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL,
     service varchar(50) NOT NULL,
     username varchar(50) NOT NULL,
-    password varchar(40) NOT NULL,
+    password varchar(255) NOT NULL,
     deleted_at DATETIME DEFAULT NULL
   )`);
 
   // ユーザーデータの挿入（パスワードは実際にはハッシュ化するべきです）
   const users = [
     { username: 'root', password: 'root' },
-    { username: 'user1', password: 'password1' },
-    { username: 'user2', password: 'password2' }
+    // { username: 'user1', password: 'password1' },
+    // { username: 'user2', password: 'password2' }
   ];
 
   // 各ユーザーに対してINSERT文を実行
   for (const user of users) {
-    const hashedPassword = await bcrypt.hash(user.password, saltRounds); // パスワードのハッシュ化
+    const hashedPassword = await hashPassword(user.password); // ハッシュ化されたパスワードをさらにハッシュ化
     await db.run('INSERT OR IGNORE INTO users (username, password) VALUES (?, ?)', [user.username, hashedPassword]);
   }
 
   // ユーザーデータの挿入（パスワードは実際にはハッシュ化するべきです）
   const passwords = [
-    { service: 'Google', username: 'user1', password: 'googlepassword1' },
-    { service: 'Amazon', username: 'user2', password: 'amazonpassword2' },
-    { service: 'Aniplex', username: 'root', password: 'aniplexpassword' }
+    { service: 'Google', username: 'user1', password: 'f490ed9801071ddfae6a0ae3c707588fB4fGFNEB0g6qTDpQNuWHtw==' },
+    { service: 'Amazon', username: 'user2', password: '0d958755f37c8083e758ffe34c9ef324/wpSJ7unoR6+oArjmV3bkg==' },
+    { service: 'Aniplex', username: 'root', password: '308b559fc2aecdcc15c0fd749f6078f8o5q1IU64v4s/bSI0KLu/KQ==' }
   ];
 
   // 各ユーザーに対してINSERT文を実行
@@ -63,7 +66,7 @@ export const setupDatabase = async () => {
 
 export const openDb = async () => {
   return open({
-    filename: './pocket.sqlite',
+    filename: DB_FILE,
     driver: sqlite3.Database,
   });
 };

@@ -5,7 +5,7 @@
       <div class="modal-content">
         <form @submit.prevent="handleSave">
           <div class="modal-header">
-            <h1 class="modal-title fs-5">Confirm</h1>
+            <h1 class="modal-title fs-5">Warning</h1>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @click="hide"></button>
           </div>
           <div class="modal-body">
@@ -13,7 +13,7 @@
           </div>
           <div class="modal-footer">
             <button type="submit" class="btn btn-secondary flex-grow-1" @click="hide">Cancel</button>
-            <button type="submit" class="btn btn-danger flex-grow-1" @click="handleExecute">Execute</button>
+            <button type="submit" class="btn btn-danger flex-grow-1" @click="handleExecute">Confirm</button>
           </div>
         </form>
       </div>

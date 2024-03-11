@@ -21,10 +21,10 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   if (to.matched.some(record => record.meta.requiresAuth)) {
     // ローカルストレージからトークンを取得
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     
     if (!token) {
-      // トークンがlocalStorageにない場合は、ログインページへリダイレクト
+      // トークンがsessionStorageにない場合は、ログインページへリダイレクト
       next('/login');
     } else {
       // `/valid` エンドポイントでトークンの検証を行う
@@ -38,8 +38,8 @@ router.beforeEach((to, from, next) => {
         next();
       })
       .catch(error => {
-        // トークンが無効な場合はlocalStorageからトークンを削除し、ログインページへリダイレクト
-        localStorage.removeItem('token');
+        // トークンが無効な場合はsessionStorageからトークンを削除し、ログインページへリダイレクト
+        sessionStorage.removeItem('token');
         next('/login');
       });
     }

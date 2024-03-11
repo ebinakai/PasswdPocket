@@ -2,21 +2,33 @@
 import express from 'express';
 import jwt, { decode } from 'jsonwebtoken';
 import cors from 'cors';
-import bcrypt from 'bcrypt';
 import { openDb, setupDatabase } from './database.js';
-
+import { comparePassword } from './functions.js';
 const app = express();
 const PORT = 3000;
 
 // リクエストボディを解析するために必要
 app.use(express.json());
 
-// CORSを全てのルートで有効にする
-app.use(cors()); 
+// CORSを許可するフロントエンドのURL
+const frontend_url = process.env.FRONTEND_URL || 'http://127.0.0.1:5173';
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (origin === frontend_url) {
+      callback(null, true);  // 許可する
+    } else {
+      callback(new Error('CORS Policy Violation: Not Allowed Origin'));  // 許可しない
+    }
+  }
+};
+
+// CORSミドルウェアを使用して、特定のオリジンからのリクエストのみを許可する
+app.use(cors(corsOptions));
 
 // 秘密鍵（実際のアプリケーションでは安全に管理する必要があります）
 const SECRET_KEY = 'your_secret_key';
 
+// データベースのセットアップ
 await setupDatabase();
 
 // ログインエンドポイント
@@ -34,10 +46,15 @@ app.post('/login', async (req, res) => {
   sql += '  username = ? ';
   sql += '; ';
 
+  // ユーザーを取得
   const user = await db.get(sql, [username]);
 
-  if (user && bcrypt.compareSync(password, user.password)) {
-    const token = jwt.sign({ id: user.id, username: user.username }, SECRET_KEY, { expiresIn: '1h' });
+  // パスワードのハッシュ化
+  const compare = await comparePassword(password, user.password);
+
+  // ユーザーが存在し、パスワードが一致する場合
+  if (user && compare) {
+    const token = jwt.sign({ id: user.id, username: user.username }, SECRET_KEY, { expiresIn: '15m' });
     res.json({ token });
   } else {
     res.status(401).send('認証に失敗しました');
