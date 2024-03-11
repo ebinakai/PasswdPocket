@@ -1,8 +1,5 @@
 import CryptoJS from 'crypto-js';
 
-// 暗号化の設定
-const fixedSalt = 'yourFixedSaltHere'; // 固定の塩
-
 // データを暗号化する関数
 export const encrypt = (text, secretKey) => {
   // 秘密鍵と初期化ベクトル (IV) を生成
@@ -38,8 +35,3 @@ export const decrypt = (ciphertext, secretKey) => {
 
   return decrypted.toString(CryptoJS.enc.Utf8);
 };
-
-// パスワードの固定の値にハッシュ化
-export const hashWithFixedSalt = (password, salt=fixedSalt) => {
-  return CryptoJS.SHA256(password + salt).toString(CryptoJS.enc.Hex);
-}

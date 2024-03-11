@@ -31,7 +31,7 @@
 
 <script>
 import apiClient from '@/api/client';
-import { hashWithFixedSalt, encrypt } from '@/api/cryption';
+import { encrypt } from '@/api/cryption';
 
 export default {
   name: 'Signup',

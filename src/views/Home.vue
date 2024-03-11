@@ -12,8 +12,26 @@
       <table id="table-pw" class="w-100">
         <thead>
           <tr>
-            <th scope="col">Service</th>
-            <th scope="col">Username</th>
+            <th scope="col">
+              <div class="d-flex align-items-center justify-content-between">
+                Service
+                <button class="btn btn-icon btn-outline-theme-4 me-3" @click="sortBy('service')">
+                  <span class="material-symbols-outlined">
+                    {{ sortKey !== 'service' ? 'expand_all': ( sortReversed ? 'keyboard_arrow_up': 'keyboard_arrow_down' ) }}
+                  </span>
+                </button>
+              </div>
+            </th>
+            <th scope="col">
+              <div class="d-flex align-items-center justify-content-between">
+                Username
+                <button class="btn btn-icon btn-outline-theme-4 me-3" @click="sortBy('username')">
+                  <span class="material-symbols-outlined">
+                    {{ sortKey !== 'username' ? 'expand_all': ( sortReversed ? 'keyboard_arrow_up': 'keyboard_arrow_down' ) }}
+                  </span>
+                </button>
+              </div>
+            </th>
             <th scope="col">Password</th>
             <th scope="col"></th>
           </tr>
@@ -114,54 +132,89 @@ export default {
       editablePassword: {},
       listPasswords: [],
       key: sessionStorage.getItem('key'),
+      token: sessionStorage.getItem('token'),
       lastCopied: '',
+      sortKey: 'service',
+      sortReversed: false,
     };
   },
   methods: {
+    // クリップボードにコピー
+    // ======================================================================================================
     copy(data, label) {
       if (navigator.clipboard) { // クリップボードAPIが利用可能かチェック
         navigator.clipboard.writeText(data).then(() => {
           this.lastCopied = label;
         }).catch(err => {
-          console.error('クリップボードへのコピーに失敗しました:', err);
+          console.error(err);
         });
       } else {
         console.error('クリップボードAPIがこのブラウザでは利用できません。');
       }
     },
+    
+    // クリップボードにコピー
+    // ======================================================================================================
+    sortBy(key) {
+      console.log('sort');
+      if (this.sortKey === key) {
+        this.sortReversed = !this.sortReversed;
+        // ソートキーが同じ場合は逆順にする
+        this.listPasswords.reverse();
+
+      } else {
+        // ソートキーが異なる場合は、ソートキーを更新
+        this.sortReversed = false;
+
+        // ソートキーが指定されていない場合は、this.sortKey を利用
+        if (key==undefined) {
+          key = this.sortKey;
+        }
+
+        // ソートキーを更新
+        this.listPasswords.sort((a, b) => {
+          if (a[key] > b[key]) {
+            return 1;
+          }
+          if (a[key] < b[key]) {
+            return -1;
+          }
+          return 0;
+        });
+      }
+      this.sortKey = key;
+      return;
+    },
+
     // パスワード追加モーダルを開く
+    // ======================================================================================================
     openAddModal() {
       this.$refs.addPasswordModal.show();
     },
 
     // パスワード編集モーダルを開く
+    // ======================================================================================================
     openEditModal(password) {
       this.editablePassword = { ...password }; // クリックされた行のデータで editablePassword を更新
       this.$refs.editPasswordModal.show(); // モーダルを開く
     },
 
     // パスワード削除モーダルを開く
+    // ======================================================================================================
     openConfirmModal(password) {
       this.editablePassword = { ...password };
       this.$refs.confirmModal.show();
     },
 
     // パスワード一覧を取得
+    // ======================================================================================================
     async getPasswordList() {
-      const token = sessionStorage.getItem('token');
-
-      // トークンがない場合はエラーを出力して終了
-      if (token === null) {
-        console.error('Token is not found.');
-        return;
-      }
-
       // パスワード一覧を取得
       const response = await apiClient.post('/password_list', {
         token: sessionStorage.getItem('token')
       }, {
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${this.token}`
         }
       });
 
@@ -175,37 +228,28 @@ export default {
           isVisible: false,
         }
       });
+
+      // ソート
+      this.sortBy();
     },
 
+    // パスワード表示の切り替え
+    // ======================================================================================================
     toggleVisiblePassword(index) {
       this.listPasswords[index].isVisible = !this.listPasswords[index].isVisible;
     },
 
     // パスワードを追加
+    // ======================================================================================================
     async addPassword(data) {
-      const token = sessionStorage.getItem('token');
-
-      // トークンがない場合はエラーを出力して終了
-      if (token === null) {
-        console.error('Token is not found.');
-        return;
-      }
-
-      // 複号キーを取得
-      const valid = await apiClient.post('/valid', {}, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
       // パスワードをデータベースに登録
       const response = await apiClient.post('/add_password', {
         service: data.service,
         username: data.username,
-        password: encrypt(data.password, decrypt(this.key, valid.data.key)),
+        password: encrypt(data.password, this.masterKey),
       }, {
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${this.token}`
         }
       });
 
@@ -214,31 +258,17 @@ export default {
     },
 
     // パスワードを編集
+    // ======================================================================================================
     async editPassword(data) {
-      const token = sessionStorage.getItem('token');
-
-      // トークンがない場合はエラーを出力して終了
-      if (token === null) {
-        console.error('Token is not found.');
-        return;
-      }
-
-      // 複号キーを取得
-      const valid = await apiClient.post('/valid', {}, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
       // 編集結果をデータベースに送信
       const response = await apiClient.post('/edit_password', {
         id: this.editablePassword.id,
         service: data.service,
         username: data.username,
-        password: encrypt(data.password, decrypt(this.key, valid.data.key)),
+        password: encrypt(data.password, this.masterKey),
       }, {
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${this.token}`
         }
       });
 
@@ -247,43 +277,48 @@ export default {
     },
 
     // パスワードを削除
+    // ======================================================================================================
     async deletePassword() {
-      const token = sessionStorage.getItem('token');
-
-      // トークンがない場合はエラーを出力して終了
-      if (token === null) {
-        console.error('Token is not found.');
-        return;
-      }
-
-
       // 削除対象のパスワードをデータベースから削除
       const response = await apiClient.post('/delete_password', {
         id: this.editablePassword.id,
       }, {
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${this.token}`
         }
       });
 
       // パスワード削除成功したら一覧を再取得
       this.getPasswordList();
     },
+
+    // マスターキーを復号化
+    // ======================================================================================================
+    async decryptMasterKey() {
+      // 複号キーを取得
+      const valid = await apiClient.post('/valid', {}, {
+        headers: {
+          'Authorization': `Bearer ${this.token}`
+        }
+      });
+
+      // sessionStorage に保存されているマスターキーを復号化
+      this.masterKey = decrypt(sessionStorage.getItem('key'), valid.data.key);
+    }
   },
   mounted() {
     // パスワード一覧を取得
     this.getPasswordList();
 
-    // ツールチップを有効化
-    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    // マスターキーを復号化
+    this.decryptMasterKey();
   },
 }
 </script>
 
 <style scoped>
 #table-pw tr {
-  border-bottom: 1px solid var(--base-color-2);
+  border-bottom: .5px solid var(--base-color-2);
 }
 
 #table-pw tr th, #table-pw tr td {

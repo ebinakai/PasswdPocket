@@ -1,17 +1,24 @@
 // ESモジュール構文を使用
 import express from 'express';
-import jwt, { decode } from 'jsonwebtoken';
 import cors from 'cors';
+import jwt from 'jsonwebtoken';
 import { openDb, setupDatabase } from './database.js';
 import { comparePassword, hashPassword, generateKey } from './functions.js';
+import * as dotenv from 'dotenv'
+
+// サーバーの設定
 const app = express();
 const PORT = 3000;
 
 // リクエストボディを解析するために必要
 app.use(express.json());
 
+// .envファイルの読み込み
+const env = dotenv.config();
+
 // CORSを許可するフロントエンドのURL
-const frontend_url = process.env.FRONTEND_URL;
+const frontend_url = env.parsed.FRONTEND_URL;
+console.debug(frontend_url);
 const corsOptions = {
   origin: function (origin, callback) {
     if (origin === frontend_url) {
