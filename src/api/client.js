@@ -1,8 +1,7 @@
 import axios from 'axios';
 
 const apiClient = axios.create({
-  // baseURL: process.env.BACKEND_URL
-  baseURL: 'http://localhost:3000/'
+  baseURL: import.meta.env.VITE_BACKEND_URL
 });
 
 export default apiClient;

@@ -156,7 +156,6 @@ export default {
     // クリップボードにコピー
     // ======================================================================================================
     sortBy(key) {
-      console.log('sort');
       if (this.sortKey === key) {
         this.sortReversed = !this.sortReversed;
         // ソートキーが同じ場合は逆順にする

@@ -8,7 +8,7 @@ import * as dotenv from 'dotenv'
 
 // サーバーの設定
 const app = express();
-const PORT = 3000;
+const PORT = 3010;
 
 // リクエストボディを解析するために必要
 app.use(express.json());
@@ -18,7 +18,6 @@ const env = dotenv.config();
 
 // CORSを許可するフロントエンドのURL
 const frontend_url = env.parsed.FRONTEND_URL;
-console.debug(frontend_url);
 const corsOptions = {
   origin: function (origin, callback) {
     if (origin === frontend_url) {
@@ -55,6 +54,11 @@ app.post('/login', async (req, res) => {
 
   // ユーザーを取得
   const user = await db.get(sql, [username]);
+
+  if (!user) {
+    res.status(401).send('ユーザーが見つかりません');
+    return;
+  }
 
   // パスワードのハッシュ化
   const compare = await comparePassword(password, user.password);
