@@ -50,6 +50,7 @@
       &copy; EbinaKai 2024
     </footer>
   </div>
+
   <!-- 追加モーダル -->
   <PasswordModal 
     ref="addPasswordModal" 
@@ -135,6 +136,7 @@ export default {
       // response.data.passwords にパスワード一覧が入っている
       console.debug(response.data.passwords);
 
+      // パスワード一覧を取得したら、パスワードを復号化して listPasswords に格納
       this.listPasswords = response.data.passwords.map( item => {
         return {
           id: item.id,

@@ -3,9 +3,6 @@
   <div class="page-wrapper flex-grow-1 d-flex flex-column px-3 pt-5">
     <header class="d-flex justify-content-between">
       <h1>Back Pocket</h1>
-      <div class="me-3">
-        <button class="btn btn-secondary btn-icon" data-bs-toggle="modal" data-bs-target="#newPwModal" @click="openModalAddPassword"><span class="material-symbols-outlined">add</span></button>
-      </div>
     </header>
     
     <main class="flex-grow-1 pt-4">
@@ -30,14 +27,9 @@
               <div class="d-flex justify-content-center">
                 <button class="btn btn-outline-success btn-icon"><span class="material-symbols-outlined">visibility</span></button>
                 
-                <!-- EditModal を開く -->
-                <button class="btn btn-outline-secondary btn-icon" @click="openEditModal(password)">
-                  <span class="material-symbols-outlined">edit_square</span>
-                </button>
-                
                 <!-- ConfirmModal を開く -->
-                <button class="btn btn-outline-danger btn-icon" @click="openConfirmModal(password)">
-                  <span class="material-symbols-outlined">delete</span>
+                <button class="btn btn-outline-primary btn-icon" @click="openConfirmModal(password)">
+                  <span class="material-symbols-outlined">restore_from_trash</span>
                 </button>
               </div>
             </td>
@@ -50,27 +42,40 @@
       &copy; EbinaKai 2024
     </footer>
   </div>
+
+  <!-- 確認モーダル -->
+  <ConfirmModal 
+    ref="confirmModal" 
+    @next="restorePassword"
+    confirmMessage="Are you sure you want to restore this item?" />
 </template>
 
 <script>
 import SideBar from '../components/SideBar.vue';
-import PasswordModal from '../components/PasswordModal.vue';
 import ConfirmModal from '../components/ConfirmModal.vue';
 import apiClient from '@/api/client';
-
+import { encrypt, decrypt } from '@/api/cryption';
 
 export default {
   name: 'Trash',
   components: {
     SideBar,
+    ConfirmModal,
   },
   data() {
     return {
       editablePassword: {},
       listPasswords: [],
+      key: sessionStorage.getItem('key'),
     };
   },
   methods: {
+    // パスワード復元モーダルを開く
+    openConfirmModal(password) {
+      this.editablePassword = { ...password };
+      this.$refs.confirmModal.show();
+    },
+
     // パスワード一覧を取得
     async getPasswordList() {
       const token = sessionStorage.getItem('token');
@@ -92,9 +97,43 @@ export default {
 
       // response.data.passwords にパスワード一覧が入っている
       console.debug('Get Passwords Successfully:', response.data);
-      this.listPasswords = response.data.passwords;
+
+      // パスワード一覧を取得したら、パスワードを復号化して listPasswords に格納
+      this.listPasswords = response.data.passwords.map( item => {
+        return {
+          id: item.id,
+          service: item.service,
+          username: item.username,
+          password: decrypt(item.password, this.key),
+        }
+      });
+      console.log(this.listPasswords);
     },
 
+    async restorePassword() {
+      
+      const token = sessionStorage.getItem('token');
+
+      // トークンがない場合はエラーを出力して終了
+      if (token === null) {
+        console.error('Token is not found.');
+        return;
+      }
+
+
+      // 削除対象のパスワードをデータベースから削除
+      const response = await apiClient.post('/restore_password', {
+        id: this.editablePassword.id,
+      }, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      // パスワード復元成功したら一覧を再取得
+      this.getPasswordList();
+
+    } ,
   },
   mounted() {
     this.getPasswordList();

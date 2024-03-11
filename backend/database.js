@@ -13,11 +13,6 @@ export const setupDatabase = async () => {
     driver: sqlite3.Database,
   });
 
-
-  // 既存のテーブルを削除
-  await db.run('DROP TABLE IF EXISTS users');
-  await db.run('DROP TABLE IF EXISTS passwords');
-
   // ユーザーテーブルの作成
   await db.run(`CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -26,20 +21,21 @@ export const setupDatabase = async () => {
   )`);
 
   // パスワードテーブルの作成
-  await db.run(`CREATE TABLE passwords(
+  await db.run(`CREATE TABLE IF NOT EXISTS passwords (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL,
     service varchar(50) NOT NULL,
     username varchar(50) NOT NULL,
     password varchar(255) NOT NULL,
-    deleted_at DATETIME DEFAULT NULL
+    created_at TIMESTAMP DEFAULT (DATETIME('now', 'localtime')),
+    updated_at TIMESTAMP DEFAULT (DATETIME('now', 'localtime')),
+    deleted_at TIMESTAMP DEFAULT NULL
   )`);
 
   // ユーザーデータの挿入（パスワードは実際にはハッシュ化するべきです）
   const users = [
     { username: 'root', password: 'root' },
-    // { username: 'user1', password: 'password1' },
-    // { username: 'user2', password: 'password2' }
+    { username: 'user2', password: 'password2' }
   ];
 
   // 各ユーザーに対してINSERT文を実行
@@ -49,16 +45,16 @@ export const setupDatabase = async () => {
   }
 
   // ユーザーデータの挿入（パスワードは実際にはハッシュ化するべきです）
-  const passwords = [
-    { service: 'Google', username: 'user1', password: 'f490ed9801071ddfae6a0ae3c707588fB4fGFNEB0g6qTDpQNuWHtw==' },
-    { service: 'Amazon', username: 'user2', password: '0d958755f37c8083e758ffe34c9ef324/wpSJ7unoR6+oArjmV3bkg==' },
-    { service: 'Aniplex', username: 'root', password: '308b559fc2aecdcc15c0fd749f6078f8o5q1IU64v4s/bSI0KLu/KQ==' }
-  ];
+  // const passwords = [
+  //   { service: 'Google', username: 'user1', password: 'f490ed9801071ddfae6a0ae3c707588fB4fGFNEB0g6qTDpQNuWHtw==' },
+  //   { service: 'Amazon', username: 'user2', password: '0d958755f37c8083e758ffe34c9ef324/wpSJ7unoR6+oArjmV3bkg==' },
+  //   { service: 'Aniplex', username: 'root', password: '308b559fc2aecdcc15c0fd749f6078f8o5q1IU64v4s/bSI0KLu/KQ==' }
+  // ];
 
   // 各ユーザーに対してINSERT文を実行
-  for (const password of passwords) {
-    await db.run('INSERT OR IGNORE INTO passwords (user_id, service, username, password) VALUES (?, ?, ?, ?)', [1, password.service, password.username, password.password]);
-  }
+  // for (const password of passwords) {
+  //   await db.run('INSERT OR IGNORE INTO passwords (user_id, service, username, password) VALUES (?, ?, ?, ?)', [1, password.service, password.username, password.password]);
+  // }
 
   // データベースのクローズ（通常はアプリケーションの終了時などに行います）
   await db.close();

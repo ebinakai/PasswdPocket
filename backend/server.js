@@ -158,15 +158,17 @@ app.post('/edit_password', async (req, res) => {
     sql += 'SET ';
     sql += '  service = ?, ';
     sql += '  username = ?, ';
-    sql += '  password = ? ';
+    sql += '  password = ?, ';
+    sql += '  updated_at = datetime("now", "localtime") ';
     sql += 'WHERE ';
-    sql += '  id = ? ';
+    sql += '  user_id = ? ';
+    sql += '  AND id = ? ';
     sql += '; ';
 
     console.log(sql, [service, username, password, id]);
 
     try {
-      await db.run(sql, [service, username, password, id]);
+      await db.run(sql, [service, username, password, decoded.id, id]);
       res.sendStatus(200); // 成功時に200 OKを送信
     } catch (error) {
       console.error(error);
@@ -187,12 +189,43 @@ app.post('/delete_password', async (req, res) => {
     sql += 'UPDATE ';
     sql += '  passwords ';
     sql += 'SET ';
+    sql += '  updated_at = datetime("now", "localtime"), ';
     sql += '  deleted_at = DATETIME("now") ';
     sql += 'WHERE ';
-    sql += '  id = ? ';
+    sql += '  user_id = ? ';
+    sql += '  AND id = ? ';
+    sql += '; ';
 
     try {
-      await db.run(sql, [id]);
+      await db.run(sql, [decoded.id, id]);
+      res.sendStatus(200); // 成功時に200 OKを送信
+    } catch (error) {
+      console.error(error);
+      res.sendStatus(500); // エラーが発生した場合に500 Internal Server Errorを送信
+    }
+  });
+});
+
+app.post('/restore_password', (req, res) => {
+  verify(req, res, async (decoded) => {
+    const db = await openDb();
+
+    const { id } = req.body;
+
+    // SQLを生成
+    let sql = '';
+    sql += 'UPDATE ';
+    sql += '  passwords ';
+    sql += 'SET ';
+    sql += '  updated_at = datetime("now", "localtime"), ';
+    sql += '  deleted_at = NULL ';
+    sql += 'WHERE ';
+    sql += '  user_id = ? ';
+    sql += '  AND id = ? ';
+    sql += '; ';
+
+    try {
+      await db.run(sql, [decoded.id, id]);
       res.sendStatus(200); // 成功時に200 OKを送信
     } catch (error) {
       console.error(error);
