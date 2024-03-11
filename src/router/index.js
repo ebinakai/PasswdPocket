@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import Home from '../views/Home.vue';
 import Trash from '../views/Trash.vue';
 import Login from '../views/Login.vue';
+import Signup from '../views/Signup.vue';
 import Logout from '../views/Logout.vue';
 import apiClient from '@/api/client';
 
@@ -9,6 +10,7 @@ const routes = [
   { path: '/', component: Home, meta: { requiresAuth: true } },
   { path: '/trash', component: Trash, meta: { requiresAuth: true } },
   { path: '/login', component: Login },
+  { path: '/signup', component: Signup },
   { path: '/logout', component: Logout },
 ];
 

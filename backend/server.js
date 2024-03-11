@@ -3,7 +3,7 @@ import express from 'express';
 import jwt, { decode } from 'jsonwebtoken';
 import cors from 'cors';
 import { openDb, setupDatabase } from './database.js';
-import { comparePassword } from './functions.js';
+import { comparePassword, hashPassword, generateKey } from './functions.js';
 const app = express();
 const PORT = 3000;
 
@@ -26,7 +26,7 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 // 秘密鍵（実際のアプリケーションでは安全に管理する必要があります）
-const SECRET_KEY = 'your_secret_key';
+const SECRET_KEY = generateKey();
 
 // データベースのセットアップ
 await setupDatabase();
@@ -54,17 +54,51 @@ app.post('/login', async (req, res) => {
 
   // ユーザーが存在し、パスワードが一致する場合
   if (user && compare) {
-    const token = jwt.sign({ id: user.id, username: user.username }, SECRET_KEY, { expiresIn: '15m' });
-    res.json({ token });
+    const { token, key } = generateToken(user);
+    res.json({ token, key });
   } else {
     res.status(401).send('認証に失敗しました');
   }
 });
 
+// サインアップエンドポイント
+app.post('/signup', async (req, res) => {
+  const { username, password } = req.body;
+  const db = await openDb();
+
+  // SQLを生成
+  let sql = '';
+  sql += 'INSERT INTO users( ';
+  sql += '  username, ';
+  sql += '  password ';
+  sql += ') ';
+  sql += 'VALUES( ';
+  sql += '  ?, ';
+  sql += '  ? ';
+  sql += ') ';
+  sql += 'RETURNING * '
+  sql += '; ';
+
+  // パスワードのハッシュ化
+  const hashedPassword = await hashPassword(password);
+
+  // ユーザーの登録
+  try {
+    const result = await db.run(sql, [username, hashedPassword]);
+    const user = await db.get('SELECT * FROM users WHERE id = ?', [result.lastID]);
+    const { token, key } = generateToken(user);
+    res.json({ token, key });
+
+  } catch (error) {
+    console.error(error);
+    res.status(409).send('ユーザーが既に存在しています');
+  }
+});
+
 // トークンの検証エンドポイント
 app.post('/valid', async (req, res) => {
-  verify(req, res, () => {
-    res.json({ message: 'トークンが有効です' });
+  verify(req, res, (decoded) => {
+    res.json({ message: 'トークンが有効です', key: decoded.key });
   });
 });
 
@@ -85,7 +119,8 @@ app.post('/password_list', async (req, res) => {
     sql += '; ';
 
     const passwords = await db.all(sql, [decoded.id]);
-    res.json({ passwords });
+    const key = decoded.key;
+    res.json({ passwords, key });
   });
 });
 
@@ -106,7 +141,8 @@ app.post('/trash_list', async (req, res) => {
     sql += '; ';
 
     const passwords = await db.all(sql, [decoded.id]);
-    res.json({ passwords });
+    const key = decoded.key;
+    res.json({ passwords, key });
   });
 });
 
@@ -116,8 +152,6 @@ app.post('/add_password', async (req, res) => {
     const db = await openDb();
 
     const { service, username, password } = req.body;
-
-    console.log(req.body);
 
     // SQLを生成
     let sql = '';
@@ -165,8 +199,6 @@ app.post('/edit_password', async (req, res) => {
     sql += '  AND id = ? ';
     sql += '; ';
 
-    console.log(sql, [service, username, password, id]);
-
     try {
       await db.run(sql, [service, username, password, decoded.id, id]);
       res.sendStatus(200); // 成功時に200 OKを送信
@@ -206,6 +238,7 @@ app.post('/delete_password', async (req, res) => {
   });
 });
 
+// パスワード復元エンドポイント
 app.post('/restore_password', (req, res) => {
   verify(req, res, async (decoded) => {
     const db = await openDb();
@@ -233,6 +266,12 @@ app.post('/restore_password', (req, res) => {
     }
   });
 });
+
+// トークンの生成
+function generateToken(user) {
+  const key = generateKey();
+  return  {token: jwt.sign({ id: user.id, username: user.username, key:key }, SECRET_KEY, { expiresIn: '15m' }), key: key};
+}
 
 // トークンの検証
 async function verify(req, res, next) {

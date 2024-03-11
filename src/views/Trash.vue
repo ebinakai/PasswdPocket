@@ -22,10 +22,14 @@
           <tr v-for="(password, index) in listPasswords" :key="index">
             <td scope="row">{{ password.service }}</td>
             <td>{{ password.username }}</td>
-            <td>{{ password.password }}</td>
+            <td>{{ password.isVisible ? password.password : '********' }}</td>
             <td>
               <div class="d-flex justify-content-center">
-                <button class="btn btn-outline-success btn-icon"><span class="material-symbols-outlined">visibility</span></button>
+                <button class="btn btn-outline-success btn-icon" @click="toggleVisiblePassword(index)">
+                  <span class="material-symbols-outlined">
+                    {{ password.isVisible ? 'visibility' : 'visibility_off'}}
+                  </span>
+                </button>
                 
                 <!-- ConfirmModal を開く -->
                 <button class="btn btn-outline-primary btn-icon" @click="openConfirmModal(password)">
@@ -95,19 +99,20 @@ export default {
         }
       });
 
-      // response.data.passwords にパスワード一覧が入っている
-      console.debug('Get Passwords Successfully:', response.data);
-
       // パスワード一覧を取得したら、パスワードを復号化して listPasswords に格納
       this.listPasswords = response.data.passwords.map( item => {
         return {
           id: item.id,
           service: item.service,
           username: item.username,
-          password: decrypt(item.password, this.key),
+          password: decrypt(item.password, decrypt(this.key, response.data.key)),
+          isVisible: false,
         }
       });
-      console.log(this.listPasswords);
+    },
+
+    toggleVisiblePassword(index) {
+      this.listPasswords[index].isVisible = !this.listPasswords[index].isVisible;
     },
 
     async restorePassword() {
@@ -154,15 +159,8 @@ export default {
   width: 30%;
 }
 
-#table-pw .btn-icon:hover {
-  color: var(--bs-btn-color);
-  background-color: transparent;
-  opacity: .8;
-}
-
 #table-pw tr td:hover {
   color: var(--base-color-4);
   cursor: pointer;
 }
-
 </style>

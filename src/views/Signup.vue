@@ -6,16 +6,18 @@
 
     <main class="flex-grow-1 d-flex align-items-center justify-content-center">
       <form @submit.prevent="validateForm" class="py-4">
-        <h2 class="text-center fs-3 mb-4">Login</h2>
+        <h2 class="text-center fs-3 mb-4">Welcome</h2>
         <div class="mb-4">
-          <input type="text" class="form-control" placeholder="Username" v-model="username" :class="{ 'is-invalid': failedUsername }" autocomplete="username">
+          <input type="text" class="form-control" placeholder="New Username" v-model="username" :class="{ 'is-invalid': failedUsername }" autocomplete="username">
         </div>
         <div class="mb-4">
-          <input type="password" class="form-control" aria-labelledby="passwordHelpBlock" placeholder="Password" v-model="password" :class="{ 'is-invalid': failedPassword }" autocomplete="current-password">
+          <input type="password" class="form-control" aria-labelledby="passwordHelpBlock" placeholder="New Password" v-model="password" :class="{ 'is-invalid': failedPassword }" autocomplete="current-password">
+        </div>
+        <div class="mb-4">
+          <input type="password" class="form-control" aria-labelledby="passwordHelpBlock" placeholder="New Password Again" v-model="passwordAgain" :class="{ 'is-invalid': failedPasswordAgain }" autocomplete="current-password">
         </div>
         <div class="d-grid gap-2">
-          <button class="btn btn-secondary" type="submit">Pocket In</button>
-          <button class="btn btn-outline-secondary" type="button" @click="signup">Make Pocket</button>
+          <button class="btn btn-secondary" type="submit">Make Pocket</button>
         </div>
       </form>
     </main>
@@ -28,33 +30,37 @@
 
 <script>
 import apiClient from '@/api/client';
-import { encrypt, decrypt } from '@/api/cryption';
+import { hashWithFixedSalt, encrypt } from '@/api/cryption';
 
 export default {
-  name: 'Login',
+  name: 'Signup',
   data() {
     return {
       username: '',
       password: '',
+      passwordAgain: '',
       failedUsername: false, // ユーザー名入力のバリデーション状態
       failedPassword: false, // パスワード入力のバリデーション状態
+      failedPasswordAgain: false, // パスワード再入力のバリデーション状態
     };
   },
   methods: {
     async validateForm() {
       this.failedUsername = this.username.trim() === '';
       this.failedPassword = this.password.trim() === '';
+      this.failedPasswordAgain = this.passwordAgain.trim() === '' && this.password === this.passwordAgain;
 
-      if (!this.failedUsername && !this.failedPassword) {
-        await this.login(); // loginメソッドの完了を待つ
+      if (!this.failedUsername && !this.failedPassword && !this.failedPasswordAgain) {
+        await this.signup(); // signupメソッドの完了を待つ
         this.username = '';
         this.password = '';
+        this.passwordAgain = '';
       }
     },
-    async login() {
+    async signup() {
       try {
         
-        const response = await apiClient.post('/login', {
+        const response = await apiClient.post('/signup', {
           username: this.username,
           password: this.password,
         });
@@ -64,17 +70,15 @@ export default {
         sessionStorage.setItem('token', response.data.token);
         sessionStorage.setItem('key', encryptedPassword);
         
-        // ログイン成功後の処理を行う
+        // // サインアップ成功後の処理を行う
         this.$router.push('/'); // ルートパスにリダイレクト
       } catch (error) {
         console.error('Login failed:', error);
-        // ログイン失敗時の処理を行う
+        // サインアップ失敗時の処理を行う
         this.failedUsername = true;
         this.failedPassword = true;
+        this.failedPasswordAgain = true;
       }
-    },
-    async signup() {
-      this.$router.push('/signup');
     }
   },
   mounted() {
