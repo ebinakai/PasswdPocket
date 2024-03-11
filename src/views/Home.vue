@@ -11,6 +11,7 @@
     <main class="flex-grow-1 pt-4 overflow-y-auto">
 
       <div class="list-pw">
+        
         <!-- table header -->
         <div class="list-pw-head">
           <div class="row">
@@ -38,8 +39,8 @@
           </div>
         </div>
         <!-- End table header -->
-        <!-- table body -->
         
+        <!-- table body -->
         <div class="list-pw-body">
           <!-- パスワードがない場合 -->
           <div class="w-100" v-if="listPasswords.length === 0">

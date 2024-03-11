@@ -6,33 +6,68 @@
     </header>
     
     <main class="flex-grow-1 pt-4">
-      <table id="table-pw" class="w-100">
-        <thead>
-          <tr>
-            <th scope="col">Service</th>
-            <th scope="col">Username</th>
-            <th scope="col">Password</th>
-            <th scope="col"></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-if="listPasswords.length === 0">
-            <th colspan="3" class="text-center">pocket is empty...</th>
-          </tr>
-          <tr v-for="(password, index) in listPasswords" :key="index">
-            <td scope="row">
-              {{ password.service }}
-            </td>
-            <td>
-              <button class="btn-outline-sccess btn-icon"></button>
-              {{ password.username }}
-            </td>
-            <td>
-              <button class="btn-outline-sccess btn-icon"></button>
-              {{ password.isVisible ? password.password : '********' }}
-            </td>
-            <td>
-              <div class="d-flex justify-content-center">
+      <div class="list-pw">
+        
+        <!-- table header -->
+        <div class="list-pw-head">
+          <div class="row">
+            <div class="col-12 col-sm-4 col-lg-3 d-flex align-items-center justify-content-between">
+              <p class=" m-0">Service</p>
+            </div>
+  
+            <div class="col-sm-8 col-lg-4 d-none d-sm-flex align-items-center justify-content-between">
+              <p class="ps-2 m-0">Username</p>
+            </div>
+  
+            <div class="col-lg-5 d-none d-lg-flex align-items-center justify-content-between" style="height: 40px;">
+              <p class="ps-2 m-0">Password</p>
+            </div>
+          </div>
+        </div>
+        <!-- End table header -->
+
+        <!-- table body -->
+        <div class="list-pw-body">
+          <!-- パスワードがない場合 -->
+          <div class="w-100" v-if="listPasswords.length === 0">
+            <div class="text-center">pocket is empty...</div>
+          </div>
+
+          <!-- パスワード一覧 -->
+          <div v-for="(password, index) in listPasswords" :key="index" class="row">
+
+            <!-- サービス名 -->
+            <div class="col-sm-4 col-lg-3 d-flex align-items-center justify-content-between">
+              <div class="d-flex align-items-center justify-content-between flex-grow-1">
+                {{ password.service }}
+              </div>
+              <div class="btn-wrapper d-flex d-sm-none justify-content-center align-items-center">
+                <!-- EditModal を開く -->
+                <button class="btn btn-outline-theme-3 btn-icon" @click="openEditModal(password)">
+                  <span class="material-symbols-outlined">edit_square</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- ユーザー名 -->
+            <div class="col-sm-8 col-lg-4 d-none d-sm-flex align-items-center justify-content-between ps-3" @click="test">
+              <div class="d-flex align-items-center justify-content-between flex-grow-1">
+                {{ password.username }}
+              </div>
+              <div class="btn-wrapper d-flex d-lg-none justify-content-center align-items-center">
+                <!-- EditModal を開く -->
+                <button class="btn btn-outline-theme-3 btn-icon" @click="openEditModal(password)">
+                  <span class="material-symbols-outlined">edit_square</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- パスワード -->
+            <div class="col-lg-5 d-none d-lg-flex align-items-center justify-content-between">
+              <div class="flex-grow-1 d-flex justify-content-between align-items-center ps-2">
+                {{ password.isVisible ? password.password : '********' }}
+              </div>
+              <div class="btn-wrapper d-flex justify-content-center align-items-center">
                 <button class="btn btn-outline-success btn-icon" @click="toggleVisiblePassword(index)">
                   <span class="material-symbols-outlined">
                     {{ password.isVisible ? 'visibility' : 'visibility_off'}}
@@ -44,10 +79,11 @@
                   <span class="material-symbols-outlined">restore_from_trash</span>
                 </button>
               </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+            </div>
+          </div>
+        </div>
+        <!-- End table body -->
+      </div>
     </main>
     
     <footer class="text-center py-2">
@@ -83,12 +119,14 @@ export default {
   },
   methods: {
     // パスワード復元モーダルを開く
+    // ======================================================================================================
     openConfirmModal(password) {
       this.editablePassword = { ...password };
       this.$refs.confirmModal.show();
     },
 
     // パスワード一覧を取得
+    // ======================================================================================================
     async getPasswordList() {
       const token = sessionStorage.getItem('token');
 
@@ -119,10 +157,14 @@ export default {
       });
     },
 
+    // パスワード表示の切り替え
+    // ======================================================================================================
     toggleVisiblePassword(index) {
       this.listPasswords[index].isVisible = !this.listPasswords[index].isVisible;
     },
 
+    // パスワード復元
+    // ======================================================================================================
     async restorePassword() {
       
       const token = sessionStorage.getItem('token');
@@ -155,20 +197,15 @@ export default {
 </script>
 
 <style scoped>
-#table-pw tr {
-  border-bottom: 1px solid var(--base-color-2);
+.list-pw-head > .row,
+.list-pw-body > .row {
+  border-bottom: .5px solid var(--base-color-2);
+  margin: 0;
+  padding: .5rem 0;
 }
 
-#table-pw tr td, #table-pw tr th {
-  padding: .5rem;
-}
-
-#table-pw tr th, #table-pw td {
-  width: 30%;
-}
-
-#table-pw tr td:hover {
-  color: var(--base-color-4);
+.list-pw-body .row:hover {
+  background-color: var(--theme-color-1);
   cursor: pointer;
 }
 </style>
