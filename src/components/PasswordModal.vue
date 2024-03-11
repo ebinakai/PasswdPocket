@@ -29,25 +29,31 @@
                     v-model="localUsername"
                     autocomplete="false">
             </div>
-            <div class="mb-4">
-              <input type="password"
+            <div class="position-relative">
+              <input type="text"
                     name="newPassword"
-                    class="form-control"
+                    class="form-control pe-5"
                     :class="{ 'is-invalid': failedPassword }"
                     aria-labelledby="passwordHelpBlock"
                     placeholder="Password"
                     v-model="localPassword"
                     autocomplete="false">
+              <button type="button" class="btn btn-icon btn-genpass position-absolute" @click="handleGenerateStrongPassword">
+                <span class="material-symbols-outlined" :class="{ 'rotate': isAnimating }">replay</span>
+              </button>
             </div>
-            <div>
-              <input type="password"
-                    name="newPasswordAgain"
-                    class="form-control"
-                    :class="{ 'is-invalid': failedPasswordAgain }"
-                    aria-labelledby="passwordAgainHelpBlock"
-                    placeholder="Password Again"
-                    v-model="localPasswordAgain"
-                    autocomplete="false">
+            <div class="d-flex justify-content-between pt-3 mx-3 flex-wrap">
+              <label><input v-model="passwordRules.uppercase" type="checkbox" class="me-1 form-check-input">Upper Case</label>
+              <label><input v-model="passwordRules.lowercase" type="checkbox" class="me-1 form-check-input">Lower Case</label>
+              <label><input v-model="passwordRules.numbers" type="checkbox" class="me-1 form-check-input">Numbers</label>
+              <label><input v-model="passwordRules.symbols" type="checkbox" class="me-1 form-check-input">Symbols</label>
+            </div>
+            <div class="d-flex align-items-center pt-3">
+              <label class="me-3">Length:</label>
+              <input type="range" class="form-range flex-grow-1 mt-1" min="4" max="30" v-model="passwordLength">
+              <div class="fw-bold ps-3" style="width: 3rem;">
+                {{ passwordLength }}
+              </div>
             </div>
           </div>
           <div class="modal-footer">
@@ -75,22 +81,24 @@ export default {
       type: String,
       default: ''
     },
-    newPasswordAgain: {
-      type: String,
-      default: ''
-    },
   },
   data() {
     return {
       localService: this.newService,
       localUsername: this.newUsername,
       localPassword: this.newPassword,
-      localPasswordAgain: this.newPasswordAgain,
       failedService: false,         // サービス名入力のバリデーション状態
       failedUsername: false,        // ユーザー名入力のバリデーション状態
       failedPassword: false,        // パスワード入力のバリデーション状態
-      failedPasswordAgain: false,   // パスワード確認入力のバリデーション状態
       isVisible: false,             // モーダルの表示状態
+      passwordLength: 16,
+      isAnimating: false, // ボタンの回転状態
+      passwordRules: {
+        uppercase: true,
+        lowercase: true,
+        numbers: true,
+        symbols: false,
+      }
     };
   },
   methods: {
@@ -99,16 +107,23 @@ export default {
     },
     hide() {
       this.isVisible = false; // モーダルを非表示
+
+      // 入力値をクリア
+      this.localService = '';
+      this.localUsername = '';
+      this.localPassword = '';
+      this.failedService = '';
+      this.failedUsername = '';
+      this.failedPassword = '';
     },
     handleSave() {
       // バリデーションを実行
       this.failedService = this.localService.trim() === '';
       this.failedUsername = this.localUsername.trim() === '';
       this.failedPassword = this.localPassword.trim() === '';
-      this.failedPasswordAgain = this.localPasswordAgain.trim() === '' || this.localPassword !== this.localPasswordAgain;
 
       // バリデーションエラーがなければ処理を実行
-      if (!this.failedService && !this.failedUsername && !this.failedPassword && !this.failedPasswordAgain) {
+      if (!this.failedService && !this.failedUsername && !this.failedPassword) {
         this.$emit('next', {
           service: this.localService,
           username: this.localUsername,
@@ -117,12 +132,52 @@ export default {
 
         // 入力値をクリア
         this.hide();
-        this.localService = '';
-        this.localUsername = '';
-        this.localPassword = '';
-        this.localPasswordAgain = '';
       }
-    }
+    },
+
+    handleGenerateStrongPassword() {
+      this.isAnimating = true; // アニメーションをトリガー
+      
+      // アニメーション終了後に状態をリセット（例: 1秒後）
+      setTimeout(() => {
+        this.isAnimating = false;
+      }, 200);
+      
+      this.localPassword = this.generateStrongPassword(); // 強力なパスワードを生成
+    },
+
+    // ランダムな強力なパスワードを生成
+    // ======================================================================================================
+    generateStrongPassword() {
+      const charset = {
+        lowercase: 'abcdefghijklmnopqrstuvwxyz',
+        uppercase: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+        numbers: '0123456789',
+        symbols: '!@#$%^&*()-_=+[]{};:\'"<>,.?/'
+      };
+
+      // 選択された文字種から利用可能な文字を取得
+      let availableChars = '';
+      availableChars += this.passwordRules.lowercase ? charset.lowercase : '';
+      availableChars += this.passwordRules.uppercase ? charset.uppercase : '';
+      availableChars += this.passwordRules.numbers ? charset.numbers : '';
+      availableChars += this.passwordRules.symbols ? charset.symbols : '';
+
+      // 利用可能な文字がない場合はエラーを出力
+      if (availableChars.length === 0) {
+        return '';
+      }
+
+      // パスワードを生成
+      let password = '';
+      for (let i = 0; i < this.passwordLength; i++) {
+        const randomIndex = Math.floor(Math.random() * availableChars.length);
+        password += availableChars[randomIndex];
+      }
+
+      // 生成されたパスワードを返す
+      return password;
+    },
   },
   watch: {
     newService(newVal) {
@@ -134,15 +189,21 @@ export default {
     newPassword(newVal) {
       this.localPassword = newVal;      // newPassword プロップの変更を監視
     },
-    newPasswordAgain(newVal) {
-      this.localPasswordAgain = newVal; // newPasswordAgain プロップの変更を監視
-    },
     isVisible(newVal) {
       if (newVal) {
         this.modal.show(); // isVisible が true になったらモーダルを表示
       } else {
         this.modal.hide(); // isVisible が false になったらモーダルを非表示
       }
+    },
+    passwordLength(newVal) {
+      this.handleGenerateStrongPassword();
+    },
+    passwordRules: {
+      handler() {
+        this.handleGenerateStrongPassword();
+      },
+      deep: true
     }
   },
   mounted() {
@@ -150,3 +211,47 @@ export default {
   },
 }
 </script>
+
+<style scoped>
+.btn-genpass {
+  top: 7px;
+  right: 7px;
+  height: auto;
+  width: auto;
+  padding: 0;
+  border: none;
+}
+.is-invalid ~ .btn-genpass {
+  right: 30px;
+}
+
+.btn-genpass .rotate {
+  animation: Rotate 200ms ease-out;
+}
+
+@keyframes Rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  background: var(--base-color-2); /* トラックの背景色 */
+}
+
+input[type="range"]::-moz-range-track {
+  background: var(--base-color-2); /* トラックの背景色 */
+}
+
+/* スライダーのつまみ */
+input[type="range"]::-webkit-slider-thumb {
+  background: var(--theme-color-2); /* つまみの背景色 */
+}
+
+input[type="range"]::-moz-range-thumb {
+  background: var(--theme-color-2); /* つまみの背景色 */
+}
+</style>

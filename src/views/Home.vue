@@ -102,7 +102,6 @@
     :newService="editablePassword.service"
     :newUsername="editablePassword.username"
     :newPassword="editablePassword.password"
-    :newPasswordAgain="editablePassword.password"
   />
 
   <!-- 確認モーダル -->
@@ -303,7 +302,7 @@ export default {
 
       // sessionStorage に保存されているマスターキーを復号化
       this.masterKey = decrypt(sessionStorage.getItem('key'), valid.data.key);
-    }
+    },
   },
   mounted() {
     // パスワード一覧を取得
