@@ -5,7 +5,7 @@
       <div class="modal-content">
         <form @submit.prevent="handleSave">
           <div class="modal-header">
-            <h1 class="modal-title fs-5">Edit Record</h1>
+            <h1 class="modal-title fs-5">{{ modalTitle }}</h1>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @click="hide"></button>
           </div>
           <div class="modal-body">
@@ -81,6 +81,10 @@ export default {
       type: String,
       default: ''
     },
+    modalTitle: {
+      type: String,
+      default: 'new Record'
+    },
   },
   data() {
     return {
@@ -104,6 +108,7 @@ export default {
   methods: {
     show() {
       this.isVisible = true; // モーダルを表示
+      this.generateStrongPassword();
     },
     hide() {
       this.isVisible = false; // モーダルを非表示
@@ -141,42 +146,45 @@ export default {
       // アニメーション終了後に状態をリセット（例: 1秒後）
       setTimeout(() => {
         this.isAnimating = false;
-      }, 200);
+      }, 150);
       
-      this.localPassword = this.generateStrongPassword(); // 強力なパスワードを生成
+      this.generateStrongPassword(); // 強力なパスワードを生成
     },
 
     // ランダムな強力なパスワードを生成
     // ======================================================================================================
-    generateStrongPassword() {
+    generateStrongPassword(alphaRatio = 0.6, numberRatio = 0.2) {
       const charset = {
         lowercase: 'abcdefghijklmnopqrstuvwxyz',
         uppercase: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
         numbers: '0123456789',
-        symbols: '!@#$%^&*()-_=+[]{};:\'"<>,.?/'
+        symbols: '!@#$%^&*'
       };
 
-      // 選択された文字種から利用可能な文字を取得
-      let availableChars = '';
-      availableChars += this.passwordRules.lowercase ? charset.lowercase : '';
-      availableChars += this.passwordRules.uppercase ? charset.uppercase : '';
-      availableChars += this.passwordRules.numbers ? charset.numbers : '';
-      availableChars += this.passwordRules.symbols ? charset.symbols : '';
+      // 各セットの文字数を計算
+      const alphaCount = Math.round(this.passwordLength * alphaRatio);
+      const numberCount = Math.round(this.passwordLength * numberRatio);
+      const symbolCount = this.passwordLength - alphaCount - numberCount;
 
-      // 利用可能な文字がない場合はエラーを出力
-      if (availableChars.length === 0) {
-        return '';
-      }
+      // ランダムな文字を選択
+      const randomChar = (category, count) => {
+        let chars = '';
+        for (let i = 0; i < count; i++) {
+          chars += category[Math.floor(Math.random() * category.length)];
+        }
+        return chars;
+      };
 
-      // パスワードを生成
+      // パスワード生成
       let password = '';
-      for (let i = 0; i < this.passwordLength; i++) {
-        const randomIndex = Math.floor(Math.random() * availableChars.length);
-        password += availableChars[randomIndex];
-      }
+      password += randomChar(charset.lowercase + charset.uppercase, alphaCount); // アルファベット
+      password += randomChar(charset.numbers, numberCount); // 数字
+      password += randomChar(charset.symbols, symbolCount); // 記号
 
+      // パスワードのシャッフル
+      password = password.split('').sort(() => 0.5 - Math.random()).join('');
       // 生成されたパスワードを返す
-      return password;
+      this.localPassword =  password;
     },
   },
   watch: {
@@ -197,11 +205,11 @@ export default {
       }
     },
     passwordLength(newVal) {
-      this.handleGenerateStrongPassword();
+      this.generateStrongPassword();
     },
     passwordRules: {
       handler() {
-        this.handleGenerateStrongPassword();
+        this.generateStrongPassword();
       },
       deep: true
     }
@@ -226,7 +234,7 @@ export default {
 }
 
 .btn-genpass .rotate {
-  animation: Rotate 200ms ease-out;
+  animation: Rotate 150ms ease-out;
 }
 
 @keyframes Rotate {

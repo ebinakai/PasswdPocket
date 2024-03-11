@@ -9,59 +9,87 @@
     </header>
     
     <main class="flex-grow-1 pt-4 overflow-y-auto">
-      <table id="table-pw" class="w-100">
-        <thead>
-          <tr>
-            <th scope="col">
-              <div class="d-flex align-items-center justify-content-between">
-                Service
-                <button class="btn btn-icon btn-outline-theme-4 me-3" @click="sortBy('service')">
-                  <span class="material-symbols-outlined">
-                    {{ sortKey !== 'service' ? 'expand_all': ( sortReversed ? 'keyboard_arrow_up': 'keyboard_arrow_down' ) }}
-                  </span>
-                </button>
-              </div>
-            </th>
-            <th scope="col">
-              <div class="d-flex align-items-center justify-content-between">
-                Username
-                <button class="btn btn-icon btn-outline-theme-4 me-3" @click="sortBy('username')">
-                  <span class="material-symbols-outlined">
-                    {{ sortKey !== 'username' ? 'expand_all': ( sortReversed ? 'keyboard_arrow_up': 'keyboard_arrow_down' ) }}
-                  </span>
-                </button>
-              </div>
-            </th>
-            <th scope="col">Password</th>
-            <th scope="col"></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-if="listPasswords.length === 0">
-            <th colspan="3" class="text-center">pocket is empty...</th>
-          </tr>
-          <tr v-for="(password, index) in listPasswords" :key="index">
-            <td scope="row">
-              {{ password.service }}
-            </td>
-            <td>
-              <div class="d-flex align-items-center justify-content-between">
-                {{ password.username }}
-                <button class="btn btn-icon btn-outline-theme-4 me-3" @click="copy(password.username, `username-${index}`)">
+
+      <div class="list-pw">
+        <!-- table header -->
+        <div class="list-pw-head">
+          <div class="row">
+            <div class="col-12 col-sm-4 col-lg-3 d-flex align-items-center justify-content-between">
+              <p class=" m-0">Service</p>
+              <button class="btn btn-icon btn-outline-theme-4" @click="sortBy('service')">
+                <span class="material-symbols-outlined">
+                  {{ sortKey !== 'service' ? 'expand_all': ( sortReversed ? 'keyboard_arrow_up': 'keyboard_arrow_down' ) }}
+                </span>
+              </button>
+            </div>
+  
+            <div class="col-sm-8 col-lg-4 d-none d-sm-flex align-items-center justify-content-between">
+              <p class="ps-2 m-0">Username</p>
+              <button class="btn btn-icon btn-outline-theme-4" @click="sortBy('username')">
+                <span class="material-symbols-outlined">
+                  {{ sortKey !== 'username' ? 'expand_all': ( sortReversed ? 'keyboard_arrow_up': 'keyboard_arrow_down' ) }}
+                </span>
+              </button>
+            </div>
+  
+            <div class="col-lg-5 d-none d-lg-flex align-items-center justify-content-between" style="height: 40px;">
+              <p class="ps-2 m-0">Password</p>
+            </div>
+          </div>
+        </div>
+        <!-- End table header -->
+        <!-- table body -->
+        
+        <div class="list-pw-body">
+          <!-- パスワードがない場合 -->
+          <div class="w-100" v-if="listPasswords.length === 0">
+            <div class="text-center">pocket is empty...</div>
+          </div>
+
+          <!-- パスワード一覧 -->
+          <div v-for="(password, index) in listPasswords" :key="index" class="row">
+
+            <!-- サービス名 -->
+            <div class="col-sm-4 col-lg-3 d-flex align-items-center justify-content-between">
+              <div class="d-flex align-items-center justify-content-between flex-grow-1">
+                {{ password.service }}
+                <button class="btn btn-icon btn-outline-theme-4" @click="copy(password.username, `username-${index}`)">
                   <span class="material-symbols-outlined">{{ lastCopied === `username-${index}` ? 'done' : 'content_copy' }}</span>
                 </button>
               </div>
-            </td>
-            <td>
-              <div class="d-flex align-items-center justify-content-between">
+              <div class="btn-wrapper d-flex d-sm-none justify-content-center align-items-center">
+                <!-- EditModal を開く -->
+                <button class="btn btn-outline-theme-3 btn-icon" @click="openEditModal(password)">
+                  <span class="material-symbols-outlined">edit_square</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- ユーザー名 -->
+            <div class="col-sm-8 col-lg-4 d-none d-sm-flex align-items-center justify-content-between ps-3" @click="test">
+              <div class="d-flex align-items-center justify-content-between flex-grow-1">
+                {{ password.username }}
+                <button class="btn btn-icon btn-outline-theme-4" @click="copy(password.username, `username-${index}`)">
+                  <span class="material-symbols-outlined">{{ lastCopied === `username-${index}` ? 'done' : 'content_copy' }}</span>
+                </button>
+              </div>
+              <div class="btn-wrapper d-flex d-lg-none justify-content-center align-items-center">
+                <!-- EditModal を開く -->
+                <button class="btn btn-outline-theme-3 btn-icon" @click="openEditModal(password)">
+                  <span class="material-symbols-outlined">edit_square</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- パスワード -->
+            <div class="col-lg-5 d-none d-lg-flex align-items-center justify-content-between">
+              <div class="flex-grow-1 d-flex justify-content-between align-items-center ps-2">
                 {{ password.isVisible ? password.password : '********' }}
-                <button class="btn btn-icon btn-outline-theme-4 me-3" @click="copy(password.password, `password-${index}`)">
+                <button class="btn btn-icon btn-outline-theme-4" @click="copy(password.password, `password-${index}`)">
                   <span class="material-symbols-outlined">{{ lastCopied === `password-${index}` ? 'done' : 'content_copy' }}</span>
                 </button>
               </div>
-            </td>
-            <td>
-              <div class="d-flex justify-content-center">
+              <div class="btn-wrapper d-flex justify-content-center align-items-center">
                 <button class="btn btn-outline-success btn-icon" @click="toggleVisiblePassword(index)">
                   <span class="material-symbols-outlined">
                     {{ password.isVisible ? 'visibility' : 'visibility_off'}}
@@ -78,10 +106,11 @@
                   <span class="material-symbols-outlined">delete</span>
                 </button>
               </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+            </div>
+          </div>
+        </div>
+        <!-- End table body -->
+      </div>
     </main>
     
     <footer class="text-center py-2">
@@ -93,12 +122,14 @@
   <PasswordModal 
     ref="addPasswordModal" 
     @next="addPassword"
+    modalTitle='New Record'
   />
 
   <!-- 編集モーダル -->
   <PasswordModal 
     ref="editPasswordModal" 
     @next="editPassword"
+    modalTitle='Edit Record'
     :newService="editablePassword.service"
     :newUsername="editablePassword.username"
     :newPassword="editablePassword.password"
@@ -138,6 +169,9 @@ export default {
     };
   },
   methods: {
+    test(){
+      console.log('test');
+    },
     // クリップボードにコピー
     // ======================================================================================================
     copy(data, label) {
@@ -152,9 +186,12 @@ export default {
       }
     },
     
-    // クリップボードにコピー
+    // ソート
     // ======================================================================================================
     sortBy(key) {
+      // クリップボードの最終コピー情報をリセット
+      this.lastCopied = '';
+
       if (this.sortKey === key) {
         this.sortReversed = !this.sortReversed;
         // ソートキーが同じ場合は逆順にする
@@ -315,24 +352,14 @@ export default {
 </script>
 
 <style scoped>
-#table-pw tr {
+.list-pw-head > .row,
+.list-pw-body > .row {
   border-bottom: .5px solid var(--base-color-2);
+  margin: 0;
+  padding: .5rem 0;
 }
 
-#table-pw tr th, #table-pw tr td {
-  padding-left: .5rem;
-}
-
-#table-pw tr td, #table-pw tr th {
-  padding-top: .5rem;
-  padding-bottom: .5rem;
-}
-
-#table-pw tr th, #table-pw td {
-  width: 30%;
-}
-
-#table-pw tbody tr:hover {
+.list-pw-body .row:hover {
   background-color: var(--theme-color-1);
   cursor: pointer;
 }
@@ -346,5 +373,13 @@ export default {
 
 #btn-add:hover {
   transform: scale(1.3);
+}
+
+@media screen and (max-width: 992px) {
+  #btn-add {
+    bottom: 3rem;
+    right: 1rem;
+  }
+  
 }
 </style>

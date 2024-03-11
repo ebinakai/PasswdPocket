@@ -31,7 +31,7 @@ const corsOptions = {
 // CORSミドルウェアを使用して、特定のオリジンからのリクエストのみを許可する
 app.use(cors(corsOptions));
 
-// 秘密鍵（実際のアプリケーションでは安全に管理する必要があります）
+// 秘密鍵の生成
 const SECRET_KEY = generateKey();
 
 // データベースのセットアップ
