@@ -32,7 +32,7 @@
                 </button>
                 
                 <!-- ConfirmModal を開く -->
-                <button class="btn btn-outline-primary btn-icon" @click="openConfirmModal(password)">
+                <button class="btn btn-outline-theme-2 btn-icon" @click="openConfirmModal(password)">
                   <span class="material-symbols-outlined">restore_from_trash</span>
                 </button>
               </div>

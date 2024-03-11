@@ -51,7 +51,7 @@
             </div>
           </div>
           <div class="modal-footer">
-            <button type="submit" class="btn btn-secondary flex-grow-1 w-100">Save</button>
+            <button type="submit" class="btn btn-theme-3 flex-grow-1 w-100">Save</button>
           </div>
         </form>
       </div>

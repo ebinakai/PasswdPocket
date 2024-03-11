@@ -14,8 +14,8 @@
           <input type="password" class="form-control" aria-labelledby="passwordHelpBlock" placeholder="Password" v-model="password" :class="{ 'is-invalid': failedPassword }" autocomplete="current-password">
         </div>
         <div class="d-grid gap-2">
-          <button class="btn btn-secondary" type="submit">Pocket In</button>
-          <button class="btn btn-outline-secondary" type="button" @click="signup">Make Pocket</button>
+          <button class="btn btn-theme-3" type="submit">Pocket In</button>
+          <button class="btn btn-outline-theme-3" type="button" @click="signup">Make Pocket</button>
         </div>
       </form>
     </main>
@@ -90,11 +90,11 @@ form {
   max-width: 450px;
   padding: 15px;
   margin: auto;
-  border: 2px solid var(--base-color-2);
+  border: 1px solid var(--theme-color-3);
   border-radius: .5rem;
 }
 
 form h2 {
-  color: var(--base-color-4);
+  color: var(--theme-color-4);
 }
 </style>

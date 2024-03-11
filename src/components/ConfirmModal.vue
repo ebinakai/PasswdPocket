@@ -12,7 +12,7 @@
             <p>{{ this.confirmMessage }}</p>
           </div>
           <div class="modal-footer">
-            <button type="submit" class="btn btn-secondary flex-grow-1" @click="hide">Cancel</button>
+            <button type="submit" class="btn btn-theme-1 flex-grow-1" @click="hide">Cancel</button>
             <button type="submit" class="btn btn-danger flex-grow-1" @click="handleExecute">Confirm</button>
           </div>
         </form>

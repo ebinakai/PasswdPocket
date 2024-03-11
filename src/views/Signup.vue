@@ -17,7 +17,8 @@
           <input type="password" class="form-control" aria-labelledby="passwordHelpBlock" placeholder="New Password Again" v-model="passwordAgain" :class="{ 'is-invalid': failedPasswordAgain }" autocomplete="current-password">
         </div>
         <div class="d-grid gap-2">
-          <button class="btn btn-secondary" type="submit">Make Pocket</button>
+          <button class="btn btn-theme-3" type="submit">Make Pocket</button>
+          <button class="btn btn-outline-theme-3" type="button" @click="back">Back</button>
         </div>
       </form>
     </main>
@@ -45,6 +46,9 @@ export default {
     };
   },
   methods: {
+    back() {
+      this.$router.push('/'); // ルートパスにリダイレクト
+    },
     async validateForm() {
       this.failedUsername = this.username.trim() === '';
       this.failedPassword = this.password.trim() === '';

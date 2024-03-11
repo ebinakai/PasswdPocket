@@ -4,11 +4,11 @@
     <header class="d-flex justify-content-between">
       <h1>Passwd Pocket</h1>
       <div class="me-3">
-        <button class="btn btn-secondary btn-icon" @click="openAddModal"><span class="material-symbols-outlined">add</span></button>
+        <button class="btn btn-theme-4 btn-icon" @click="openAddModal"><span class="material-symbols-outlined">add</span></button>
       </div>
     </header>
     
-    <main class="flex-grow-1 pt-4">
+    <main class="flex-grow-1 pt-4 overflow-y-auto">
       <table id="table-pw" class="w-100">
         <thead>
           <tr>
@@ -35,7 +35,7 @@
                 </button>
                 
                 <!-- EditModal を開く -->
-                <button class="btn btn-outline-secondary btn-icon" @click="openEditModal(password)">
+                <button class="btn btn-outline-theme-3 btn-icon" @click="openEditModal(password)">
                   <span class="material-symbols-outlined">edit_square</span>
                 </button>
                 
@@ -261,8 +261,8 @@ export default {
   width: 30%;
 }
 
-#table-pw tr td:hover {
-  color: var(--base-color-4);
+#table-pw tbody tr:hover {
+  background-color: var(--theme-color-1);
   cursor: pointer;
 }
 </style>
