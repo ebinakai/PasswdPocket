@@ -4,7 +4,7 @@ import { encrypt, decrypt } from '@/api/cryption';
 // パスワード一覧を取得
 // ======================================================================================================
 export const getPasswordList = async (ep, token, masterKey) => {
-  const response = await apiClient.post(ep, {}, {
+  const response = await apiClient.get(ep, {
     headers: {
       'Authorization': `Bearer ${token}`
     }
@@ -25,7 +25,7 @@ export const getPasswordList = async (ep, token, masterKey) => {
 // ======================================================================================================
 export const decryptMasterKey = async (token) => {
   // 複号キーを取得
-  const valid = await apiClient.post('/valid', {}, {
+  const valid = await apiClient.get('/valid', {
     headers: {
       'Authorization': `Bearer ${token}`
     }

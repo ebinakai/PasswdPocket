@@ -107,14 +107,14 @@ app.post('/signup', async (req, res) => {
 });
 
 // トークンの検証エンドポイント
-app.post('/valid', async (req, res) => {
+app.get('/valid', async (req, res) => {
   verify(req, res, (decoded) => {
     res.json({ message: 'トークンが有効です', key: decoded.key });
   });
 });
 
 // パスワード一覧取得エンドポイント
-app.post('/password_list', async (req, res) => {
+app.get('/password_list', async (req, res) => {
   verify(req, res, async (decoded) => {
     const db = await openDb();
 
@@ -136,7 +136,7 @@ app.post('/password_list', async (req, res) => {
 });
 
 // ゴミ箱エンドポイント
-app.post('/trash_list', async (req, res) => {
+app.get('/trash_list', async (req, res) => {
   verify(req, res, async (decoded) => {
     const db = await openDb();
 

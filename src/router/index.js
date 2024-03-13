@@ -30,7 +30,7 @@ router.beforeEach((to, from, next) => {
       next('/login');
     } else {
       // `/valid` エンドポイントでトークンの検証を行う
-      apiClient.post('/valid', {}, {
+      apiClient.get('/valid', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
