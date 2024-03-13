@@ -113,7 +113,7 @@ app.post('/valid', async (req, res) => {
   });
 });
 
-// ユーザー一覧取得エンドポイント
+// パスワード一覧取得エンドポイント
 app.post('/password_list', async (req, res) => {
   verify(req, res, async (decoded) => {
     const db = await openDb();
