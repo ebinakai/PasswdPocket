@@ -112,7 +112,7 @@ export default {
     async handleGetPasswordList() {
 
       // パスワード一覧を取得したら、パスワードを復号化して listPasswords に格納
-      this.listPasswords = await getPasswordList('/password_list', this.token, this.masterKey)
+      this.listPasswords = await getPasswordList('/password_list', this.token, this.masterKey);
 
       // ソート
       this.$refs.passwordTable.sortBy();
@@ -125,6 +125,7 @@ export default {
         service: data.service,
         username: data.username,
         password: encrypt(data.password, this.masterKey),
+        note: data.note,
       }, {
         headers: {
           'Authorization': `Bearer ${this.token}`
@@ -143,6 +144,7 @@ export default {
         service: data.service,
         username: data.username,
         password: encrypt(data.password, this.masterKey),
+        note: data.note,
       }, {
         headers: {
           'Authorization': `Bearer ${this.token}`

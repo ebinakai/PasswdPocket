@@ -17,6 +17,7 @@ export const getPasswordList = async (ep, token, masterKey) => {
       service: item.service,
       username: item.username,
       password: decrypt(item.password, masterKey),
+      note: item.note,
       isVisible: false,
     }
   });

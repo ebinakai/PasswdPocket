@@ -162,7 +162,7 @@ app.post('/add_password', async (req, res) => {
   verify(req, res, async (decoded) => {
     const db = await openDb();
 
-    const { service, username, password } = req.body;
+    const { service, username, password, note } = req.body;
 
     // SQLを生成
     let sql = '';
@@ -170,9 +170,11 @@ app.post('/add_password', async (req, res) => {
     sql += '  user_id, ';
     sql += '  service, ';
     sql += '  username, ';
-    sql += '  password ';
+    sql += '  password, ';
+    sql += '  note ';
     sql += ') ';
     sql += 'VALUES( ';
+    sql += '  ?, ';
     sql += '  ?, ';
     sql += '  ?, ';
     sql += '  ?, ';
@@ -181,7 +183,7 @@ app.post('/add_password', async (req, res) => {
     sql += '; ';
 
     try {
-      await db.run(sql, [decoded.id, service, username, password]);
+      await db.run(sql, [decoded.id, service, username, password, note]);
       res.sendStatus(201); // 成功時に201 Createdを送信
     } catch (error) {
       console.error(error);
@@ -195,7 +197,7 @@ app.post('/edit_password', async (req, res) => {
   verify(req, res, async (decoded) => {
     const db = await openDb();
 
-    const { id, service, username, password } = req.body;
+    const { id, service, username, password, note } = req.body;
 
     // SQLを生成
     let sql = '';
@@ -204,6 +206,7 @@ app.post('/edit_password', async (req, res) => {
     sql += '  service = ?, ';
     sql += '  username = ?, ';
     sql += '  password = ?, ';
+    sql += '  note = ?, ';
     sql += '  updated_at = datetime("now", "localtime") ';
     sql += 'WHERE ';
     sql += '  user_id = ? ';
@@ -211,7 +214,7 @@ app.post('/edit_password', async (req, res) => {
     sql += '; ';
 
     try {
-      await db.run(sql, [service, username, password, decoded.id, id]);
+      await db.run(sql, [service, username, password, note, decoded.id, id]);
       res.sendStatus(200); // 成功時に200 OKを送信
     } catch (error) {
       console.error(error);

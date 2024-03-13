@@ -21,9 +21,10 @@ export const setupDatabase = async () => {
   await db.run(`CREATE TABLE IF NOT EXISTS passwords (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL,
-    service varchar(50) NOT NULL,
-    username varchar(50) NOT NULL,
-    password varchar(255) NOT NULL,
+    service VARCHAAR(50) NOT NULL,
+    username VARCHAAR(50) NOT NULL,
+    password VARCHAAR(255) NOT NULL,
+    note TEXT NOT NULL DEFAULT '',
     created_at TIMESTAMP DEFAULT (DATETIME('now', 'localtime')),
     updated_at TIMESTAMP DEFAULT (DATETIME('now', 'localtime')),
     deleted_at TIMESTAMP DEFAULT NULL

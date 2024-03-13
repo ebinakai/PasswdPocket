@@ -190,6 +190,11 @@ export default {
 </script>
 
 <style scoped>
+
+.list-pw-head {
+  color: var(--base-color-4);
+  font-size: 1.2rem;
+}
 .list-pw-head > .row,
 .list-pw-body > .row {
   border-bottom: .5px solid var(--base-color-2);

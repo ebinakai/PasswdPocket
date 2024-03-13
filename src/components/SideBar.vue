@@ -1,7 +1,7 @@
 <template>
   <aside class="pt-sm-3" :class="{'open': isSideOpen}">
     <nav>
-      <ul class="list-unstyled d-flex flex-sm-column justify-content-center flex-grow-1 mb-0">
+      <ul class="list-unstyled d-flex flex-sm-column justify-content-around flex-grow-1 mb-0">
         <li><router-link to="/" class="d-block" active-class="active">
           <span class="material-symbols-outlined">home</span></router-link>
         </li>
@@ -51,8 +51,8 @@ aside nav ul li:hover a {
 }
 
 @media screen and (max-width: 576px) {
-  aside nav ul li {
-    padding: 1.5rem 2rem .5rem 2rem;
+  aside nav ul {
+    border-bottom: .5px solid var(--base-color-2);
   }
 
   aside nav ul li a {
@@ -63,6 +63,7 @@ aside nav ul li:hover a {
   aside nav ul li a.active {
     border-top: 3px solid var(--theme-color-3);
     border-left: none;
+    color: var(--base-color-4);
   }
 }
 </style>

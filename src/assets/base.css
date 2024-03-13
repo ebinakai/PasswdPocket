@@ -16,18 +16,19 @@
 }
 
 html {
-  font-size: 16px;
+  background-color: var(--base-color-1);
 }
 
 body {
   font-family: "Noto Sans JP", sans-serif;
+  background-color: transparent;
   font-size: 16px;
-  background-color: var(--base-color-1);
   color: var(--base-color-3);
 }
 
 #wrapper > div {
   height: 100vh;
+  width: 100vw;
 }
 
 .material-symbols-outlined {

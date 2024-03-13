@@ -9,71 +9,104 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @click="hide"></button>
           </div>
           <div class="modal-body">
-            <div class="mb-4 d-flex">
-              <input type="text"
-                    name="newService"
-                    class="form-control"
-                    :class="{ 'is-invalid': failedService }"
-                    aria-labelledby="serviceHelpBlock"
-                    placeholder="Service Name"
-                    v-model="localService"
-                    autocomplete="false"
-                    :disabled="!localIsEditable">
-
-              <button class="btn btn-icon btn-outline-theme-4 ms-2" type="button" @click="copy(localService, 'service')">
-                <span class="material-symbols-outlined">{{ lastCopied === 'service' ? 'done' : 'content_copy' }}</span>
-              </button>
-            </div>
-            <div class="mb-4 d-flex">
-              <input type="text"
-                    name="newUsername"
-                    class="form-control"
-                    :class="{ 'is-invalid': failedUsername }"
-                    aria-labelledby="usernameHelpBlock"
-                    placeholder="Username"
-                    v-model="localUsername"
-                    autocomplete="false"
-                    :disabled="!localIsEditable">
-
-              <button class="btn btn-icon btn-outline-theme-4 ms-2" type="button" @click="copy(localUsername, 'username')">
-                <span class="material-symbols-outlined">{{ lastCopied === 'username' ? 'done' : 'content_copy' }}</span>
-              </button>
-            </div>
-            <div class="position-relative d-flex">
-              <input type="text"
-                    name="newPassword"
-                    class="form-control pe-5"
-                    :class="{ 'is-invalid': failedPassword }"
-                    aria-labelledby="passwordHelpBlock"
-                    placeholder="Password"
-                    v-model="localPassword"
-                    autocomplete="false"
-                    :disabled="!localIsEditable">
-              <button 
-                type="button" 
-                class="btn btn-icon btn-genpass position-absolute" 
-                v-if="localIsEditable"
-                @click="handleGenerateStrongPassword">
-                <span class="material-symbols-outlined" :class="{ 'rotate': isAnimating }">replay</span>
-              </button>
-
-              <button class="btn btn-icon btn-outline-theme-4 ms-2" type="button" @click="copy(localPassword, 'password')">
-                <span class="material-symbols-outlined">{{ lastCopied === 'password' ? 'done' : 'content_copy' }}</span>
-              </button>
-            </div>
-            <div v-if="localIsEditable">
-              <div class="d-flex justify-content-between pt-3 mx-3 flex-wrap">
-                <label><input v-model="passwordRules.uppercase" type="checkbox" class="me-1 form-check-input">Upper Case</label>
-                <label><input v-model="passwordRules.lowercase" type="checkbox" class="me-1 form-check-input">Lower Case</label>
-                <label><input v-model="passwordRules.numbers" type="checkbox" class="me-1 form-check-input">Numbers</label>
-                <label><input v-model="passwordRules.symbols" type="checkbox" class="me-1 form-check-input">Symbols</label>
+            <!-- サービス名入力欄 -->
+            <div class="pb-2 border-bottom">
+              <label for="service" class="form-label ms-2">Service</label>
+              <div class="d-flex align-items-center">
+                <input type="text"
+                      name="newService"
+                      class="form-control"
+                      :class="{ 'is-invalid': failedService }"
+                      aria-labelledby="serviceHelpBlock"
+                      placeholder="Service Name"
+                      v-model="localService"
+                      autocomplete="false"
+                      :disabled="!localIsEditable">
+  
+                <button class="btn btn-icon btn-outline-theme-4 ms-2" type="button" tabindex="-1" @click="copy(localService, 'service')">
+                  <span class="material-symbols-outlined">{{ lastCopied === 'service' ? 'done' : 'content_copy' }}</span>
+                </button>
               </div>
-              <div class="d-flex align-items-center pt-3">
-                <label class="me-3">Length:</label>
-                <input type="range" class="form-range flex-grow-1 mt-1" min="4" max="30" v-model="passwordLength">
-                <div class="fw-bold ps-3" style="width: 3rem;">
-                  {{ passwordLength }}
+            </div>
+
+            <!-- ユーザー名入力欄 -->
+            <div class="pb-2 mt-1 border-bottom">
+              <label for="username" class="form-label ms-2">Username</label>
+              <div class="d-flex align-items-center">
+                <input type="text"
+                      name="newUsername"
+                      class="form-control"
+                      :class="{ 'is-invalid': failedUsername }"
+                      aria-labelledby="usernameHelpBlock"
+                      placeholder="Username"
+                      v-model="localUsername"
+                      autocomplete="false"
+                      :disabled="!localIsEditable">
+  
+                <button class="btn btn-icon btn-outline-theme-4 ms-2" type="button" tabindex="-1" @click="copy(localUsername, 'username')">
+                  <span class="material-symbols-outlined">{{ lastCopied === 'username' ? 'done' : 'content_copy' }}</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- パスワード入力欄 -->
+            <div class="pb-2 mt-1 border-bottom">
+              <label for="password" class="form-label ms-2">Password</label>
+              <div class="position-relative d-flex">
+                <input type="text"
+                      name="newPassword"
+                      class="form-control pe-5"
+                      :class="{ 'is-invalid': failedPassword }"
+                      aria-labelledby="passwordHelpBlock"
+                      placeholder="Password"
+                      v-model="localPassword"
+                      autocomplete="false"
+                      :disabled="!localIsEditable">
+                <button 
+                  type="button" 
+                  class="btn btn-icon btn-genpass position-absolute" 
+                  v-if="localIsEditable"
+                  @click="handleGenerateStrongPassword">
+                  <span class="material-symbols-outlined" :class="{ 'rotate': isAnimating }">replay</span>
+                </button>
+  
+                <button class="btn btn-icon btn-outline-theme-4 ms-2" type="button" tabindex="-1" @click="copy(localPassword, 'password')">
+                  <span class="material-symbols-outlined">{{ lastCopied === 'password' ? 'done' : 'content_copy' }}</span>
+                </button>
+              </div>
+
+              <!-- パスワードジェネレータ -->
+              <div v-if="localIsEditable">
+                <div class="row ms-1">
+                  <label class="col-6 mt-2"><input v-model="passwordRules.uppercase" type="checkbox" class="me-1 form-check-input">Upper Case</label>
+                  <label class="col-6 mt-2"><input v-model="passwordRules.lowercase" type="checkbox" class="me-1 form-check-input">Lower Case</label>
+                  <label class="col-6 mt-2"><input v-model="passwordRules.numbers" type="checkbox" class="me-1 form-check-input">Numbers</label>
+                  <label class="col-6 mt-2"><input v-model="passwordRules.symbols" type="checkbox" class="me-1 form-check-input">Symbols</label>
                 </div>
+                <div class="d-flex align-items-center pt-3">
+                  <label class="me-3">Length:</label>
+                  <input type="range" class="form-range flex-grow-1 mt-1" min="4" max="30" v-model="passwordLength">
+                  <div class="fw-bold ps-3" style="width: 3rem;">
+                    {{ passwordLength }}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- メモ欄 -->
+            <div class="mt-1">
+              <label for="note" class="form-label ms-2">Note</label>
+              <div class="d-flex align-items-center">
+                <textarea 
+                    v-model="localNote" 
+                    @input="adjustHeight" 
+                    class="form-control autoresize"
+                    :disabled="!localIsEditable"
+                    placeholder="Note here...">
+                </textarea>
+                <button class="btn btn-icon btn-outline-theme-4 ms-2" type="button" tabindex="-1" @click="copy(localNote, 'note')">
+                  <span class="material-symbols-outlined">{{ lastCopied === 'note' ? 'done' : 'content_copy' }}</span>
+                </button>
               </div>
             </div>
           </div>
@@ -122,6 +155,7 @@ export default {
       localService: this.newEditablePassword.service,
       localUsername: this.newEditablePassword.username,
       localPassword: this.newEditablePassword.password,
+      localNote: this.newEditablePassword.note,
       localModalTitle: this.newModalTitle,
       localIsEditable: this.isEditable,
       failedService: false,   // サービス名入力のバリデーション状態
@@ -156,12 +190,19 @@ export default {
     // モーダルの表示
     // ======================================================================================================
     show() {
+      // パスワードが空の場合は強力なパスワードを生成
       if (this.localPassword === "") {
         this.generateStrongPassword();
       }
-      this.localIsEditable = this.isEditable;
-      this.handleEditable(this.isEditable);
-      this.isVisible = true; // モーダルを表示
+
+      // 編集可能状態が変更されたら処理を実行
+      if (this.localIsEditable !== this.isEditable) {
+        this.localIsEditable = this.isEditable;
+        this.handleEditable(this.isEditable);
+      }
+
+      // モーダルを表示
+      this.isVisible = true;
     },
     // モーダルを非表示
     // ======================================================================================================
@@ -170,6 +211,12 @@ export default {
 
       // コピー状態をリセット
       this.lastCopied = '';
+
+      // 入力値をクリア
+      this.localService = '';
+      this.localUsername = '';
+      this.localPassword = '';
+      this.localNote = '';
 
       // バリデートエラーをリセット
       this.failedService = false;
@@ -190,6 +237,7 @@ export default {
           service: this.localService,
           username: this.localUsername,
           password: this.localPassword,
+          note: this.localNote,
         });
 
         // 入力値をクリア
@@ -200,9 +248,9 @@ export default {
     // ======================================================================================================
     handleEditable(state) {
       if(state) {
-        this.localModalTitle = 'edit Record';
+        this.localModalTitle = 'Edit Record';
       } else {
-        this.localModalTitle = 'view Record';
+        this.localModalTitle = 'View Record';
       }
       this.localIsEditable = state;
     },
@@ -214,6 +262,7 @@ export default {
         service: this.localService,
         username: this.localUsername,
         password: this.localPassword,
+        note: this.localNote,
       });
       this.hide();
     },
@@ -225,6 +274,7 @@ export default {
         service: this.localService,
         username: this.localUsername,
         password: this.localPassword,
+        note: this.localNote,
       });
       this.hide();
     },
@@ -242,7 +292,7 @@ export default {
     },
     // ランダムな強力なパスワードを生成
     // ======================================================================================================
-    generateStrongPassword(alphaRatio = 0.6, numberRatio = 0.2) {
+    generateStrongPassword(probabilities=[3,3,2,1]) {
       const charset = {
         lowercase: 'abcdefghijklmnopqrstuvwxyz',
         uppercase: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
@@ -250,31 +300,29 @@ export default {
         symbols: '!@#$%^&*'
       };
 
-      // 各セットの文字数を計算
-      const alphaCount = Math.round(this.passwordLength * alphaRatio);
-      const numberCount = Math.round(this.passwordLength * numberRatio);
-      const symbolCount = this.passwordLength - alphaCount - numberCount;
-
-      // ランダムな文字を選択
-      const randomChar = (category, count) => {
-        let chars = '';
-        for (let i = 0; i < count; i++) {
-          chars += category[Math.floor(Math.random() * category.length)];
-        }
-        return chars;
-      };
+      // 各文字の重みを設定
+      let weightedCharacters = "";
+      if (this.passwordRules.lowercase) weightedCharacters += charset.lowercase.repeat(parseInt(probabilities[0]));
+      if (this.passwordRules.uppercase) weightedCharacters += charset.uppercase.repeat(parseInt(probabilities[1]));
+      if (this.passwordRules.numbers) weightedCharacters += charset.numbers.repeat(parseInt(probabilities[2]));
+      if (this.passwordRules.symbols) weightedCharacters += charset.symbols.repeat(parseInt(probabilities[3]));
 
       // パスワード生成
-      let password = '';
-      password += randomChar(charset.lowercase + charset.uppercase, alphaCount); // アルファベット
-      password += randomChar(charset.numbers, numberCount);                      // 数字
-      password += randomChar(charset.symbols, symbolCount);                      // 記号
+      let password = "";
+      for (let i = 0; i < this.passwordLength; i++) {
+          password += weightedCharacters.charAt(Math.floor(Math.random() * weightedCharacters.length));
+      }
 
-      // パスワードのシャッフル
-      password = password.split('').sort(() => 0.5 - Math.random()).join('');
       // 生成されたパスワードを返す
       this.localPassword =  password;
     },
+    // テキストエリアの高さを自動調整
+    // ======================================================================================================
+    adjustHeight(event) {
+      const element = event.target;
+      element.style.height = 'auto'; // 高さを一度リセット
+      element.style.height = element.scrollHeight + 'px'; // スクロール高さに合わせて高さを設定
+    }
   },
   watch: {
     newEditablePassword(newVal) {
@@ -282,9 +330,7 @@ export default {
       this.localService = newVal.service;
       this.localUsername = newVal.username;
       this.localPassword = newVal.password;
-    },
-    newModalTitle(newVal) {
-      this.localModalTitle = newVal; // newModalTitle プロップの変更を監視
+      this.localNote = newVal.note;
     },
     isVisible(newVal) {
       if (newVal) {
@@ -321,8 +367,14 @@ export default {
   padding: 0;
   border: none;
 }
+
 .is-invalid ~ .btn-genpass {
   right: 80px;
+}
+
+.autoresize {
+    resize: none; /* ユーザーによるリサイズを無効にする */
+    overflow: hidden; /* スクロールバーが表示されないようにする */
 }
 
 .btn-genpass .rotate {
