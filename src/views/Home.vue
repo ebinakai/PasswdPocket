@@ -1,147 +1,147 @@
 <template>
-  <SideBar />
-  <div class="page-wrapper flex-grow-1 d-flex flex-column px-3 pt-5">
-    <header class="d-flex justify-content-between">
+  <div class="page-wrapper flex-grow-1 d-flex flex-column">
+    <header class="py-3 ps-4 border-bottom text-center text-sm-start">
       <h1>Passwd Pocket</h1>
-      <div class="me-3" id="btn-add">
-        <button class="btn btn-theme-3 btn-icon-lg rounded-pill" @click="openAddModal"><span class="material-symbols-outlined">add</span></button>
-      </div>
     </header>
+    <div class="d-flex flex-sm-row flex-column flex-grow-1">
+      <SideBar ref="sideBar" />
+      <div class="page-wrapper flex-grow-1 d-flex flex-column px-3 ">
+        <main class="flex-grow-1 pt-sm-4 overflow-y-auto">
+          <div class="list-pw">
+            
+            <!-- table header -->
+            <div class="list-pw-head">
+              <div class="row fw-bold">
+                <div class="col-12 col-sm-4 col-lg-3 d-flex align-items-center justify-content-between cursor-pointer" @click="sortBy('service')">
+                  <p class=" m-0">Service</p>
+                  <div class="btn-icon">
+                    <span class="material-symbols-outlined">
+                      {{ sortKey !== 'service' ? 'expand_all': ( sortReversed ? 'keyboard_arrow_up': 'keyboard_arrow_down' ) }}
+                    </span>
+                  </div>
+                </div>
+      
+                <div class="col-sm-8 col-lg-4 d-none d-sm-flex align-items-center justify-content-between border-start border-2 cursor-pointer" @click="sortBy('username')">
+                  <p class="ps-2 m-0">Username</p>
+                  <div class="btn-icon">
+                    <span class="material-symbols-outlined">
+                      {{ sortKey !== 'username' ? 'expand_all': ( sortReversed ? 'keyboard_arrow_up': 'keyboard_arrow_down' ) }}
+                    </span>
+                  </div>
+                </div>
+      
+                <div class="col-lg-5 d-none d-lg-flex align-items-center justify-content-between border-start border-2" style="height: 40px;">
+                  <p class="ps-2 m-0">Password</p>
+                </div>
+              </div>
+            </div>
+            <!-- End table header -->
+            
+            <!-- table body -->
+            <div class="list-pw-body">
+              <!-- パスワードがない場合 -->
+              <div class="w-100 row" v-if="listPasswords.length === 0">
+                <div class="text-center d-flex align-items-center">
+                  <div class="flex-grow-1">
+                    pocket is empty...
+                  </div>
+                </div>
+              </div>
     
-    <main class="flex-grow-1 pt-4 overflow-y-auto">
-
-      <div class="list-pw">
+              <!-- パスワード一覧 -->
+              <div v-for="(password, index) in listPasswords" :key="index" class="row" @click="openViewModal(password)">
+    
+                <!-- サービス名 -->
+                <div class="col-sm-4 col-lg-3 d-flex align-items-center justify-content-between">
+                  <div class="d-flex align-items-center justify-content-between flex-grow-1">
+                    {{ password.service }}
+                  </div>
+                </div>
+    
+                <!-- ユーザー名 -->
+                <div class="col-sm-8 col-lg-4 d-none d-sm-flex align-items-center border-start border-2 ps-3">
+                  <div class="d-flex align-items-center justify-content-between flex-grow-1">
+                    {{ password.username }}
+    
+                    <!-- コピーボタン -->
+                    <button class="btn btn-icon btn-outline-theme-4 border-0" @click.stop="copy(password.username, `username-${index}`)">
+                      <span class="material-symbols-outlined">{{ lastCopied === `username-${index}` ? 'done' : 'content_copy' }}</span>
+                    </button>
+                  </div>
+                </div>
+    
+                <!-- パスワード -->
+                <div class="col-lg-5 d-none d-lg-flex align-items-center border-start border-2">
+                  <div class="flex-grow-1 d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center">
+                      <!-- パスワードの表示・非表示切り替え -->
+                      <button class="btn btn-outline-theme-1 btn-icon border-0" @click.stop="toggleVisiblePassword(index)">
+                        <span class="material-symbols-outlined">
+                          {{ password.isVisible ? 'visibility' : 'visibility_off'}}
+                        </span>
+                      </button>
+                      {{ password.isVisible ? password.password : '・・・・・・・・・' }}
+                    </div>
+    
+                    <!-- コピーボタン -->
+                    <button class="btn btn-icon btn-outline-theme-4 border-0" @click.stop="copy(password.password, `password-${index}`)">
+                      <span class="material-symbols-outlined">{{ lastCopied === `password-${index}` ? 'done' : 'content_copy' }}</span>
+                    </button>
+                  </div>
+    
+                  <!-- 操作ボタン群 -->
+                  <div class="btn-wrapper d-flex justify-content-center align-items-center">
+                    <!-- EditModal を開く -->
+                    <button class="btn btn-outline-theme-3 btn-icon" @click.stop="openEditModal(password)">
+                      <span class="material-symbols-outlined">edit_square</span>
+                    </button>
+                    
+                    <!-- ConfirmModal を開く -->
+                    <button class="btn btn-outline-theme-3 btn-icon" @click.stop="openConfirmModal(password)">
+                      <span class="material-symbols-outlined">delete</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- End table body -->
+          </div>
+        </main>
         
-        <!-- table header -->
-        <div class="list-pw-head">
-          <div class="row">
-            <div class="col-12 col-sm-4 col-lg-3 d-flex align-items-center justify-content-between">
-              <p class=" m-0">Service</p>
-              <button class="btn btn-icon btn-outline-theme-4" @click="sortBy('service')">
-                <span class="material-symbols-outlined">
-                  {{ sortKey !== 'service' ? 'expand_all': ( sortReversed ? 'keyboard_arrow_up': 'keyboard_arrow_down' ) }}
-                </span>
-              </button>
-            </div>
-  
-            <div class="col-sm-8 col-lg-4 d-none d-sm-flex align-items-center justify-content-between">
-              <p class="ps-2 m-0">Username</p>
-              <button class="btn btn-icon btn-outline-theme-4" @click="sortBy('username')">
-                <span class="material-symbols-outlined">
-                  {{ sortKey !== 'username' ? 'expand_all': ( sortReversed ? 'keyboard_arrow_up': 'keyboard_arrow_down' ) }}
-                </span>
-              </button>
-            </div>
-  
-            <div class="col-lg-5 d-none d-lg-flex align-items-center justify-content-between" style="height: 40px;">
-              <p class="ps-2 m-0">Password</p>
-            </div>
-          </div>
-        </div>
-        <!-- End table header -->
-        
-        <!-- table body -->
-        <div class="list-pw-body">
-          <!-- パスワードがない場合 -->
-          <div class="w-100" v-if="listPasswords.length === 0">
-            <div class="text-center">pocket is empty...</div>
-          </div>
-
-          <!-- パスワード一覧 -->
-          <div v-for="(password, index) in listPasswords" :key="index" class="row">
-
-            <!-- サービス名 -->
-            <div class="col-sm-4 col-lg-3 d-flex align-items-center justify-content-between">
-              <div class="d-flex align-items-center justify-content-between flex-grow-1">
-                {{ password.service }}
-                <button class="btn btn-icon btn-outline-theme-4" @click="copy(password.username, `username-${index}`)">
-                  <span class="material-symbols-outlined">{{ lastCopied === `username-${index}` ? 'done' : 'content_copy' }}</span>
-                </button>
-              </div>
-              <div class="btn-wrapper d-flex d-sm-none justify-content-center align-items-center">
-                <!-- EditModal を開く -->
-                <button class="btn btn-outline-theme-3 btn-icon" @click="openEditModal(password)">
-                  <span class="material-symbols-outlined">edit_square</span>
-                </button>
-              </div>
-            </div>
-
-            <!-- ユーザー名 -->
-            <div class="col-sm-8 col-lg-4 d-none d-sm-flex align-items-center justify-content-between ps-3" @click="test">
-              <div class="d-flex align-items-center justify-content-between flex-grow-1">
-                {{ password.username }}
-                <button class="btn btn-icon btn-outline-theme-4" @click="copy(password.username, `username-${index}`)">
-                  <span class="material-symbols-outlined">{{ lastCopied === `username-${index}` ? 'done' : 'content_copy' }}</span>
-                </button>
-              </div>
-              <div class="btn-wrapper d-flex d-lg-none justify-content-center align-items-center">
-                <!-- EditModal を開く -->
-                <button class="btn btn-outline-theme-3 btn-icon" @click="openEditModal(password)">
-                  <span class="material-symbols-outlined">edit_square</span>
-                </button>
-              </div>
-            </div>
-
-            <!-- パスワード -->
-            <div class="col-lg-5 d-none d-lg-flex align-items-center justify-content-between">
-              <div class="flex-grow-1 d-flex justify-content-between align-items-center ps-2">
-                {{ password.isVisible ? password.password : '********' }}
-                <button class="btn btn-icon btn-outline-theme-4" @click="copy(password.password, `password-${index}`)">
-                  <span class="material-symbols-outlined">{{ lastCopied === `password-${index}` ? 'done' : 'content_copy' }}</span>
-                </button>
-              </div>
-              <div class="btn-wrapper d-flex justify-content-center align-items-center">
-                <button class="btn btn-outline-success btn-icon" @click="toggleVisiblePassword(index)">
-                  <span class="material-symbols-outlined">
-                    {{ password.isVisible ? 'visibility' : 'visibility_off'}}
-                  </span>
-                </button>
-                
-                <!-- EditModal を開く -->
-                <button class="btn btn-outline-theme-3 btn-icon" @click="openEditModal(password)">
-                  <span class="material-symbols-outlined">edit_square</span>
-                </button>
-                
-                <!-- ConfirmModal を開く -->
-                <button class="btn btn-outline-danger btn-icon" @click="openConfirmModal(password)">
-                  <span class="material-symbols-outlined">delete</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-        <!-- End table body -->
       </div>
-    </main>
-    
+    </div>
     <footer class="text-center py-2">
       &copy; EbinaKai 2024
     </footer>
+
+    <!-- 追加ボタン -->
+    <div class="me-3" id="btn-add">
+      <button class="btn btn-theme-3 btn-icon-lg rounded-pill" @click="openAddModal"><span class="material-symbols-outlined">add</span></button>
+    </div>
+
+    <!-- 追加モーダル -->
+    <PasswordModal 
+      ref="addPasswordModal" 
+      @next="addPassword"
+    />
+
+    <!-- 編集モーダル -->
+    <PasswordModal 
+      ref="editPasswordModal" 
+      @next="editPassword"
+      @copy="copy"
+      @delete="openConfirmModal"
+      newModalTitle='Edit Record'
+      :newEditablePassword="editablePassword"
+      :isEditable="isEditable"
+    />
+
+    <!-- 確認モーダル -->
+    <ConfirmModal 
+      ref="confirmModal" 
+      @next="deletePassword"
+      confirmMessage="Are you sure you want to delete this item?" />
   </div>
-
-  <!-- 追加モーダル -->
-  <PasswordModal 
-    ref="addPasswordModal" 
-    @next="addPassword"
-    modalTitle='New Record'
-  />
-
-  <!-- 編集モーダル -->
-  <PasswordModal 
-    ref="editPasswordModal" 
-    @next="editPassword"
-    modalTitle='Edit Record'
-    :newService="editablePassword.service"
-    :newUsername="editablePassword.username"
-    :newPassword="editablePassword.password"
-  />
-
-  <!-- 確認モーダル -->
-  <ConfirmModal 
-    ref="confirmModal" 
-    @next="deletePassword"
-    confirmMessage="Are you sure you want to delete this item?" />
-  
 </template>
 
 <script>
@@ -167,10 +167,12 @@ export default {
       lastCopied: '',
       sortKey: 'service',
       sortReversed: false,
+      isEditable: true,
+      isSideOpen: false,
     };
   },
   methods: {
-    test(){
+    test() {
       console.log('test');
     },
     // クリップボードにコピー
@@ -228,9 +230,18 @@ export default {
       this.$refs.addPasswordModal.show();
     },
 
+    // パスワード情報表示モーダルを開く
+    // ======================================================================================================
+    openViewModal(password) {
+      this.isEditable = false;
+      this.editablePassword = { ...password }; // クリックされた行のデータで editablePassword を更新
+      this.$refs.editPasswordModal.show(); // モーダルを開く
+    },
+
     // パスワード編集モーダルを開く
     // ======================================================================================================
     openEditModal(password) {
+      this.isEditable = true;
       this.editablePassword = { ...password }; // クリックされた行のデータで editablePassword を更新
       this.$refs.editPasswordModal.show(); // モーダルを開く
     },
@@ -238,8 +249,16 @@ export default {
     // パスワード削除モーダルを開く
     // ======================================================================================================
     openConfirmModal(password) {
+      console.debug("Password: ", password);
       this.editablePassword = { ...password };
       this.$refs.confirmModal.show();
+    },
+
+    // サイドバーの開閉
+    // ======================================================================================================
+    toggleSideOpen() {
+      this.isSideOpen = !this.isSideOpen;
+      this.$refs.sideBar.toggleSideOpen(this.isSideOpen);
     },
 
     // パスワード一覧を取得
@@ -365,6 +384,10 @@ export default {
   cursor: pointer;
 }
 
+.list-pw-body .row > div {
+  min-height: 40px;
+}
+
 #btn-add {
   position: fixed;
   bottom: 5rem;
@@ -381,6 +404,5 @@ export default {
     bottom: 3rem;
     right: 1rem;
   }
-  
 }
 </style>

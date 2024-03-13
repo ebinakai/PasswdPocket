@@ -3,7 +3,7 @@ import './assets/main.css'
 </script>
 
 <template>
-  <div id="wrapper" class="d-flex flex-row">
+  <div id="wrapper">
     <router-view></router-view>
   </div>
 </template>

@@ -9,10 +9,9 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @click="hide"></button>
           </div>
           <div class="modal-body">
-            <p>{{ this.confirmMessage }}</p>
+            <p class="mb-0 text-center">{{ this.confirmMessage }}</p>
           </div>
           <div class="modal-footer">
-            <button type="submit" class="btn btn-theme-1 flex-grow-1" @click="hide">Cancel</button>
             <button type="submit" class="btn btn-danger flex-grow-1" @click="handleExecute">Confirm</button>
           </div>
         </form>

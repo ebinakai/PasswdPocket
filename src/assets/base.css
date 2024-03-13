@@ -26,7 +26,7 @@ body {
   color: var(--base-color-3);
 }
 
-#wrapper {
+#wrapper > div {
   height: 100vh;
 }
 
@@ -40,6 +40,12 @@ body {
 
 main {
   scrollbar-color: var(--base-color-2) var(--base-color-1);
+}
+
+/* パーツ
+============================================================================================================ */
+.cursor-pointer {
+  cursor: pointer;
 }
 
 /* ヘッダー
@@ -68,6 +74,7 @@ box-shadow: 0 0 0 .15rem rgba(13,110,253,.25);
 /* ボタン
 ============================================================================================================ */
 .btn-icon {
+  color: var(--base-color-3);
   display: flex;
   align-items: center;
   justify-content: center;
