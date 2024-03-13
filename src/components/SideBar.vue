@@ -54,5 +54,15 @@ aside nav ul li:hover a {
   aside nav ul li {
     padding: 1.5rem 2rem .5rem 2rem;
   }
+
+  aside nav ul li a {
+    border-top: 3px solid transparent;
+    border-left: none;
+  }
+
+  aside nav ul li a.active {
+    border-top: 3px solid var(--theme-color-3);
+    border-left: none;
+  }
 }
 </style>
