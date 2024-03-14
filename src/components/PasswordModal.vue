@@ -65,6 +65,7 @@
                 <button 
                   type="button" 
                   class="btn btn-icon btn-genpass position-absolute" 
+                  tabindex="-1"
                   v-if="localIsEditable"
                   @click="handleGenerateStrongPassword">
                   <span class="material-symbols-outlined" :class="{ 'rotate': isAnimating }">replay</span>
@@ -78,14 +79,14 @@
               <!-- パスワードジェネレータ -->
               <div v-if="localIsEditable">
                 <div class="row ms-1">
-                  <label class="col-6 mt-2"><input v-model="passwordRules.uppercase" type="checkbox" class="me-1 form-check-input">Upper Case</label>
-                  <label class="col-6 mt-2"><input v-model="passwordRules.lowercase" type="checkbox" class="me-1 form-check-input">Lower Case</label>
-                  <label class="col-6 mt-2"><input v-model="passwordRules.numbers" type="checkbox" class="me-1 form-check-input">Numbers</label>
-                  <label class="col-6 mt-2"><input v-model="passwordRules.symbols" type="checkbox" class="me-1 form-check-input">Symbols</label>
+                  <label class="col-6 mt-2"><input v-model="passwordRules.uppercase" type="checkbox" class="me-1 form-check-input" tabindex="-1">Upper Case</label>
+                  <label class="col-6 mt-2"><input v-model="passwordRules.lowercase" type="checkbox" class="me-1 form-check-input" tabindex="-1">Lower Case</label>
+                  <label class="col-6 mt-2"><input v-model="passwordRules.numbers" type="checkbox" class="me-1 form-check-input" tabindex="-1">Numbers</label>
+                  <label class="col-6 mt-2"><input v-model="passwordRules.symbols" type="checkbox" class="me-1 form-check-input" tabindex="-1">Symbols</label>
                 </div>
                 <div class="d-flex align-items-center pt-3">
                   <label class="me-3">Length:</label>
-                  <input type="range" class="form-range flex-grow-1 mt-1" min="4" max="30" v-model="passwordLength">
+                  <input type="range" class="form-range flex-grow-1 mt-1" min="4" max="30" v-model="passwordLength" tabindex="-1">
                   <div class="fw-bold ps-3" style="width: 3rem;">
                     {{ passwordLength }}
                   </div>
@@ -135,6 +136,7 @@ export default {
         service: '',
         username: '',
         password: '',
+        note: '',
       }
     },
     newModalTitle: {

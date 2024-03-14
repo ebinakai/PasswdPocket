@@ -106,7 +106,8 @@ box-shadow: 0 0 0 .15rem rgba(13,110,253,.25);
   background-color: var(--theme-color-1);
   color: var(--base-color-4);
 }
-.btn-theme-1:hover {
+.btn-theme-1:hover,
+.btn-theme-1:focus {
   background-color: var(--theme-color-1);
   color: var(--base-color-4);
   opacity: .8;
@@ -116,7 +117,8 @@ box-shadow: 0 0 0 .15rem rgba(13,110,253,.25);
   background-color: var(--theme-color-2);
   color: var(--base-color-1);
 }
-.btn-theme-2:hover {
+.btn-theme-2:hover,
+.btn-theme-2:focus {
   background-color: var(--theme-color-2);
   color: var(--base-color-1);
   opacity: .8;
@@ -126,7 +128,8 @@ box-shadow: 0 0 0 .15rem rgba(13,110,253,.25);
   background-color: var(--theme-color-3);
   color: var(--base-color-1);
 }
-.btn-theme-3:hover {
+.btn-theme-3:hover,
+.btn-theme-3:focus {
   background-color: var(--theme-color-3);
   color: var(--base-color-1);
   opacity: .8;
@@ -136,7 +139,8 @@ box-shadow: 0 0 0 .15rem rgba(13,110,253,.25);
   background-color: var(--theme-color-4);
   color: var(--base-color-1);
 }
-.btn-theme-4:hover {
+.btn-theme-4:hover,
+.btn-theme-4:focus {
   background-color: var(--theme-color-4);
   color: var(--base-color-1);
   opacity: .8;
@@ -147,7 +151,8 @@ box-shadow: 0 0 0 .15rem rgba(13,110,253,.25);
   color: var(--theme-color-2);
   border: 1px solid var(--theme-color-2);
 }
-.btn-outline-theme-2:hover {
+.btn-outline-theme-2:hover,
+.btn-outline-theme-2:focus {
   background-color: var(--theme-color-2);
   color: var(--base-color-1);
   border: 1px solid var(--theme-color-2);
@@ -159,7 +164,8 @@ box-shadow: 0 0 0 .15rem rgba(13,110,253,.25);
   color: var(--theme-color-3);
   border: 1px solid var(--theme-color-3);
 }
-.btn-outline-theme-3:hover {
+.btn-outline-theme-3:hover,
+.btn-outline-theme-3:focus {
   background-color: var(--theme-color-3);
   color: var(--base-color-1);
   border: 1px solid var(--theme-color-3);
@@ -170,6 +176,7 @@ box-shadow: 0 0 0 .15rem rgba(13,110,253,.25);
   background-color: transparent;
   color: var(--theme-color-4);
 }
-.btn-outline-theme-4:hover {
+.btn-outline-theme-4:hover,
+.btn-outline-theme-4:focus {
   border: 1px solid var(--theme-color-4);
 }

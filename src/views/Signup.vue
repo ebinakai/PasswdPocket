@@ -50,9 +50,10 @@ export default {
       this.$router.push('/'); // ルートパスにリダイレクト
     },
     async validateForm() {
+      const invalidSpecialCharsPattern = /[()_+~`|}{\[\]:;?><,./\\-]/;
       this.failedUsername = this.username.trim() === '';
-      this.failedPassword = this.password.trim() === '';
-      this.failedPasswordAgain = this.passwordAgain.trim() === '' && this.password === this.passwordAgain;
+      this.failedPassword = this.password.trim() === '' && invalidSpecialCharsPattern.test(this.password);
+      this.failedPasswordAgain = this.passwordAgain.trim() === '' && this.password !== this.passwordAgain;
 
       if (!this.failedUsername && !this.failedPassword && !this.failedPasswordAgain) {
         await this.signup(); // signupメソッドの完了を待つ
