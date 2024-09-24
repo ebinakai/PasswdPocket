@@ -24,3 +24,10 @@ services:
       - /backend/node_modules
     ports:
       - "${BACKEND_PORT}:80"
+
+  sqlite:
+    build:
+      context: ./sqlite
+      dockerfile: Dockerfile
+    volumes:
+      - ./sqlite:/sqlite

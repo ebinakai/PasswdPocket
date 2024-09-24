@@ -3,6 +3,8 @@
 > VueJSで作成したシンプルなパスワードマネージャ「Passwd Pocket」です。
 > パーソナルユースにとどめ、自己責任で使用してください。
 
+バックエンドサーバとフロントエンドサーバに分かれており、パスワード情報は`sqlite`ファイルにマスターキーによる暗号化を施して保存しています。
+
 ## Demo
 
 ### ログイン画面
@@ -28,42 +30,21 @@
 
 ## Setup
 
-バックエンドサーバとフロントエンドサーバに分かれており、パスワード情報は`sqlite`にマスターキーによる暗号化を施して保存しています。
-
-### Front End
+一発で起動するはずです。
 
 ```bash
 # clone ripository
 git clone https://github.com/EbinaKai/PasswdPocket.git
 cd PasswdPocket
 
-# install libraries
-npm install
-
-# Compile and Hot-Reload for Development
-npm run dev
-
-# Compile and Minify for Production 
-npm run build
-
-# release
-sudo cp -R dist /var/www/html # Your DocumentRoot
-```
-
-### Back End
-
-```bash
 # set .env
 cp .env.sample .env
 
 # update .env
+nano .env
 
-# run backend server
-node ./backend/server.js
-
-# or run forever
-sudo apt install pm2
-pm2 start ./backend/server.js
+# docker-compose
+docker-compose up -d
 ```
 
 ## Credit
