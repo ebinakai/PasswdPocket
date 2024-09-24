@@ -1,41 +1,29 @@
 // ESモジュール構文を使用
-import express from 'express';
-import cors from 'cors';
-import jwt from 'jsonwebtoken';
-import { openDb, setupDatabase } from './database.js';
-import { comparePassword, hashPassword, generateKey } from './functions.js';
-import * as dotenv from 'dotenv'
+const express = require('express');
+const cors = require('cors');
+const jwt = require('jsonwebtoken');
+const { openDb, setupDatabase } = require('./database.js');
+const { comparePassword, hashPassword, generateKey } = require('./functions.js');
 
 // サーバーの設定
 const app = express();
-const PORT = 3010;
+const PORT = 80;
 
 // リクエストボディを解析するために必要
 app.use(express.json());
 
-// .envファイルの読み込み
-const env = dotenv.config();
-
 // CORSを許可するフロントエンドのURL
-const frontend_url = env.parsed.FRONTEND_URL;
-const corsOptions = {
-  origin: function (origin, callback) {
-    if (origin === frontend_url) {
-      callback(null, true);  // 許可する
-    } else {
-      callback(new Error('CORS Policy Violation: Not Allowed Origin'));  // 許可しない
-    }
-  }
-};
+const frontend_url = process.env.FRONTEND_URL;
 
 // CORSミドルウェアを使用して、特定のオリジンからのリクエストのみを許可する
-app.use(cors(corsOptions));
+app.use(cors({
+  origin: frontend_url,
+  credentials: true,
+  optionsSuccessStatus: 200
+}));
 
 // 秘密鍵の生成
 const SECRET_KEY = generateKey();
-
-// データベースのセットアップ
-await setupDatabase();
 
 // ログインエンドポイント
 app.post('/login', async (req, res) => {
@@ -310,7 +298,13 @@ async function verify(req, res, next) {
   });
 }
 
-// サーバー起動
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
+async function main() {
+  // データベースのセットアップ
+  await setupDatabase();
+  
+  // サーバー起動
+  app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
+  });
+}
+main();
