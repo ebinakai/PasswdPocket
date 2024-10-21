@@ -17,7 +17,7 @@ RUN apt-get update && \
     apt-get clean
 
 # npmをインストール
-RUN npm install -g npm@10.8.3
+RUN npm install -g npm@10.9.0
 
 # 依存関係のインストールのためにpackage.jsonとpackage-lock.jsonをコピー
 COPY ./package*.json ./
