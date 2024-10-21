@@ -11,7 +11,12 @@ ARG DB_FILE
 ENV FRONTEND_URL=${FRONTEND_URL}
 ENV DB_FILE=${DB_FILE}
 
-# 最新のnpmをインストール
+# 必要なビルドツールのインストール（ARMアーキテクチャ向けのネイティブモジュールビルド用）
+RUN apt-get update && \
+    apt-get install -y python3 build-essential g++ && \
+    apt-get clean
+
+# npmをインストール
 RUN npm install -g npm@10.8.3
 
 # 依存関係のインストールのためにpackage.jsonとpackage-lock.jsonをコピー
