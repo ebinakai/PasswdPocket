@@ -23,5 +23,6 @@ RUN npm run build
 FROM nginx:alpine
 
 COPY --from=build-stage /frontend/dist /usr/share/nginx/html
+COPY --from=build-stage /frontend/package-lock.json /tmp/
 
 CMD ["nginx", "-g", "daemon off;"]
