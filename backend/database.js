@@ -22,9 +22,9 @@ module.exports = {
     await db.run(`CREATE TABLE IF NOT EXISTS passwords (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       user_id INTEGER NOT NULL,
-      service VARCHAAR(50) NOT NULL,
-      username VARCHAAR(50) NOT NULL,
-      password VARCHAAR(255) NOT NULL,
+      service VARCHAR(50) NOT NULL,
+      username VARCHAR(50) NOT NULL,
+      password VARCHAR(255) NOT NULL,
       note TEXT NOT NULL DEFAULT '',
       created_at TIMESTAMP DEFAULT (DATETIME('now', 'localtime')),
       updated_at TIMESTAMP DEFAULT (DATETIME('now', 'localtime')),

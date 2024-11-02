@@ -271,8 +271,8 @@ app.post('/restore_password', (req, res) => {
 
 // トークンの生成
 function generateToken(user) {
-  const key = generateKey();
-  return  {token: jwt.sign({ id: user.id, username: user.username, key:key }, SECRET_KEY, { expiresIn: '15m' }), key: key};
+  const key = generateKey();  // ブラウザ内で保存時にマスターキーを暗号化するためのキー
+  return  {token: jwt.sign({ id: user.id, key:key }, SECRET_KEY, { expiresIn: '15m' }), key: key};
 }
 
 // トークンの検証
