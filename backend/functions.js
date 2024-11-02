@@ -1,5 +1,5 @@
-const crypto = require('crypto');
-const bcrypt = require('bcrypt');
+const crypto = require('crypto'); // Node.jsの暗号化モジュール
+const bcrypt = require('bcrypt'); // パスワードのハッシュ化モジュール
 
 module.exports = {
   hashPassword: async (password, saltRounds = 10) => {

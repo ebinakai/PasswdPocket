@@ -22,16 +22,16 @@ export const getPasswordList = async (ep, token, masterKey) => {
     }
   });
 }
-// マスターキーを復号化
+// キーを復号化
 // ======================================================================================================
 export const decryptMasterKey = async (token) => {
   // 複号キーを取得
-  const valid = await apiClient.get('/valid', {
+  const res = await apiClient.get('/valid', {
     headers: {
       'Authorization': `Bearer ${token}`
     }
   });
 
   // sessionStorage に保存されているマスターキーを復号化
-  return decrypt(sessionStorage.getItem('key'), valid.data.key);
+  return decrypt(sessionStorage.getItem('key'), res.data.key);
 }
