@@ -22,7 +22,7 @@ export const encrypt = (targetText, passPhrase) => {
   });
 
   // IVをBase64でエンコードし、暗号文と結合して返却
-  return salt.toString(CryptoJS.enc.Base64) + delimiter + iv.toString(CryptoJS.enc.Base64) + delimiter + encrypted.toString(CryptoJS.enc.Base64);
+  return salt.toString(CryptoJS.enc.Base64) + delimiter + iv.toString(CryptoJS.enc.Base64) + delimiter + encrypted.toString();
 };
 
 // 暗号化されたデータを復号化する関数
