@@ -41,7 +41,8 @@ app.post('/login', async (req, res) => {
   sql += '; ';
 
   // ユーザーを取得
-  const user = await db.get(sql, [username]);
+  const [rows] = await db.execute(sql, [username]);
+  const user = rows[0];
 
   if (!user) {
     res.status(401).send('ユーザーが見つかりません');
@@ -75,16 +76,15 @@ app.post('/signup', async (req, res) => {
   sql += '  ?, ';
   sql += '  ? ';
   sql += ') ';
-  sql += 'RETURNING * '
-  sql += '; ';
 
   // パスワードのハッシュ化
   const hashedPassword = await hashPassword(password);
 
   // ユーザーの登録
   try {
-    const result = await db.run(sql, [username, hashedPassword]);
-    const user = await db.get('SELECT * FROM users WHERE id = ?', [result.lastID]);
+    const [result] = await db.execute(sql, [username, hashedPassword]);
+    const [rows] = await db.execute('SELECT * FROM users WHERE id = ?', [result.insertId]);
+    const user = rows[0];
     const { token, key } = generateToken(user);
     res.json({ token, key });
 
@@ -117,7 +117,7 @@ app.get('/password_list', async (req, res) => {
     sql += '  AND deleted_at IS NULL'; // 論理削除されていないレコードのみを選択
     sql += '; ';
 
-    const passwords = await db.all(sql, [decoded.id]);
+    const [passwords] = await db.execute(sql, [decoded.id]);
     const key = decoded.key;
     res.json({ passwords, key });
   });
@@ -139,7 +139,7 @@ app.get('/trash_list', async (req, res) => {
     sql += '  AND deleted_at IS NOT NULL'; // 論理削除されたレコードのみを選択
     sql += '; ';
 
-    const passwords = await db.all(sql, [decoded.id]);
+    const [passwords] = await db.execute(sql, [decoded.id]);
     const key = decoded.key;
     res.json({ passwords, key });
   });
@@ -171,7 +171,7 @@ app.post('/add_password', async (req, res) => {
     sql += '; ';
 
     try {
-      await db.run(sql, [decoded.id, service, username, password, note]);
+      await db.execute(sql, [decoded.id, service, username, password, note]);
       res.sendStatus(201); // 成功時に201 Createdを送信
     } catch (error) {
       console.error(error);
@@ -194,15 +194,14 @@ app.post('/edit_password', async (req, res) => {
     sql += '  service = ?, ';
     sql += '  username = ?, ';
     sql += '  password = ?, ';
-    sql += '  note = ?, ';
-    sql += '  updated_at = datetime("now", "localtime") ';
+    sql += '  note = ? ';
     sql += 'WHERE ';
     sql += '  user_id = ? ';
     sql += '  AND id = ? ';
     sql += '; ';
 
     try {
-      await db.run(sql, [service, username, password, note, decoded.id, id]);
+      await db.execute(sql, [service, username, password, note, decoded.id, id]);
       res.sendStatus(200); // 成功時に200 OKを送信
     } catch (error) {
       console.error(error);
@@ -223,15 +222,14 @@ app.post('/delete_password', async (req, res) => {
     sql += 'UPDATE ';
     sql += '  passwords ';
     sql += 'SET ';
-    sql += '  updated_at = datetime("now", "localtime"), ';
-    sql += '  deleted_at = DATETIME("now") ';
+    sql += '  deleted_at = NOW() ';
     sql += 'WHERE ';
     sql += '  user_id = ? ';
     sql += '  AND id = ? ';
     sql += '; ';
 
     try {
-      await db.run(sql, [decoded.id, id]);
+      await db.execute(sql, [decoded.id, id]);
       res.sendStatus(200); // 成功時に200 OKを送信
     } catch (error) {
       console.error(error);
@@ -252,7 +250,6 @@ app.post('/restore_password', (req, res) => {
     sql += 'UPDATE ';
     sql += '  passwords ';
     sql += 'SET ';
-    sql += '  updated_at = datetime("now", "localtime"), ';
     sql += '  deleted_at = NULL ';
     sql += 'WHERE ';
     sql += '  user_id = ? ';
@@ -260,7 +257,7 @@ app.post('/restore_password', (req, res) => {
     sql += '; ';
 
     try {
-      await db.run(sql, [decoded.id, id]);
+      await db.execute(sql, [decoded.id, id]);
       res.sendStatus(200); // 成功時に200 OKを送信
     } catch (error) {
       console.error(error);
@@ -288,7 +285,8 @@ async function verify(req, res, next) {
     }
 
     const db = await openDb();
-    const user = await db.get('SELECT * FROM users WHERE id = ?', [decoded.id]);
+    const [rows] = await db.execute('SELECT * FROM users WHERE id = ?', [decoded.id]);
+    const user = rows[0];
 
     if (!user) {
       return res.status(404).send('ユーザーが見つかりません');

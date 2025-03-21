@@ -5,11 +5,9 @@ FROM node:18-slim
 WORKDIR /backend
 
 ARG FRONTEND_URL
-ARG DB_FILE
 
 # 環境変数の設定
 ENV FRONTEND_URL=${FRONTEND_URL}
-ENV DB_FILE=${DB_FILE}
 
 # 必要なビルドツールのインストール（ARMアーキテクチャ向けのネイティブモジュールビルド用）
 RUN apt-get update && \
