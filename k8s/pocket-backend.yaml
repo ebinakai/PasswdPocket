@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: pocket
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - name: backend
+        image: registry.kb/passwd-pocket-backend:latest
+        env:
+          - name: FRONTEND_URL
+            value: "https://pocket.kb"
+          - name: DB_HOST
+            value: "mysql-db.default.svc.cluster.local"
+          - name: DB_USER
+            value: "root"
+          - name: DB_PASSWORD
+            value: "rootpass"
+          - name: DB_NAME
+            value: "pocket"
+        ports:
+          - containerPort: 80
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+          limits:
+            cpu: 200m
+            memory: 200Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-srv
+  namespace: pocket
+spec:
+  selector:
+    app: backend
+  ports:
+    - port: 80
+      targetPort: 80
+  type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: backend-ingress
+  namespace: pocket
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - pocket.kb
+      secretName: pocket-tls
+  rules:
+    - host: pocket.kb
+      http:
+        paths:
+          - path: /api(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: backend-srv
+                port:
+                  number: 80

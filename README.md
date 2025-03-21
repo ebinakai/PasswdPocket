@@ -37,14 +37,9 @@
 git clone https://github.com/EbinaKai/PasswdPocket.git
 cd PasswdPocket
 
-# set .env
-cp .env.sample .env
-
-# update .env
-nano .env
-
-# docker-compose
-docker-compose up -d
+kubectl apply -f k8s/mysql-secret.yaml
+kubectl apply -f k8s/pocket-frontend.yaml
+kubectl apply -f k8s/pocket-backend.yaml
 ```
 
 ## Credit
