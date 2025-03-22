@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: backend
-        image: registry.kb/passwd-pocket-backend:latest
+        image: registry.kb/pocket/backend:1.0.0
         env:
           - name: FRONTEND_URL
             value: "https://pocket.kb"

@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: registry.kb/passwd-pocket-frontend
+        image: registry.kb/pocket/frontend:1.0.0
         env:
           - name: VITE_BACKEND_URL
             value: "https://api.pocket.kb"
