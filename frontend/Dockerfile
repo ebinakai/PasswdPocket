@@ -14,9 +14,8 @@ RUN npm ci
 # 残りのソースコードをコピー
 COPY . .
 
-ARG VITE_BACKEND_URL
-
 # 環境変数として設定
+ARG VITE_BACKEND_URL
 ENV VITE_BACKEND_URL=${VITE_BACKEND_URL}
 
 # Viteでビルド

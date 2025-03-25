@@ -20,8 +20,5 @@ RUN npm ci
 
 COPY . .
 
-ARG FRONTEND_URL
-ENV FRONTEND_URL=${FRONTEND_URL}
-
 # アプリケーションを実行
 CMD ["node", "server.js"]

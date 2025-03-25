@@ -15,18 +15,27 @@ spec:
     spec:
       containers:
       - name: backend
-        image: registry.kb/pocket/backend:1.0.0
+        image: registry.kb/pocket/backend:1.0.1
         env:
           - name: FRONTEND_URL
             value: "https://pocket.kb"
           - name: DB_HOST
-            value: "mysql-db.default.svc.cluster.local"
+            value: "mysql.kb"
           - name: DB_USER
-            value: "root"
+            valueFrom:
+              secretKeyRef:
+                name: pocket-db-secret
+                key: username
           - name: DB_PASSWORD
-            value: "rootpass"
+            valueFrom:
+              secretKeyRef:
+                name: pocket-db-secret
+                key: password
           - name: DB_NAME
-            value: "pocket"
+            valueFrom:
+              secretKeyRef:
+                name: pocket-db-secret
+                key: database
         ports:
           - containerPort: 80
         resources:
@@ -40,7 +49,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: backend-srv
+  name: backend-svc
   namespace: pocket
 spec:
   selector:
@@ -71,6 +80,6 @@ spec:
             pathType: ImplementationSpecific
             backend:
               service:
-                name: backend-srv
+                name: backend-svc
                 port:
                   number: 80
