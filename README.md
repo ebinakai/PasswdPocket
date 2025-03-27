@@ -37,8 +37,8 @@
 git clone https://github.com/EbinaKai/PasswdPocket.git
 cd PasswdPocket
 
-kubectl apply -f k8s/pocket-frontend.yaml
-kubectl apply -f k8s/pocket-backend.yaml
+kubectl apply -f k8s/frontend.yaml
+kubectl apply -f k8s/backend.yaml
 ```
 
 ## Credit
